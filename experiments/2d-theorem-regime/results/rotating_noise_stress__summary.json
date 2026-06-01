@@ -1,0 +1,60 @@
+{
+  "exp_name": "rotating_noise_stress",
+  "quad": {
+    "a": 1.0,
+    "b": 5.0
+  },
+  "steps": 800,
+  "noise_std": 0.05,
+  "seed": 0,
+  "optimizers": {
+    "proj_sgd": {
+      "x_final": -0.012949726692987667,
+      "y_final": -0.0018330489388944029,
+      "grad_norm_final": 0.015864965544640324,
+      "residual_norm_final": null,
+      "sum_phi_raw": 0.0,
+      "sum_s": 0.0
+    },
+    "fira_raw": {
+      "x_final": -0.17626736150692293,
+      "y_final": 0.42327824954206295,
+      "grad_norm_final": 2.123718930583196,
+      "residual_norm_final": null,
+      "sum_phi_raw": 8402.956830108928,
+      "sum_s": 8402.956830108928
+    },
+    "fira_clipped": {
+      "x_final": -0.029942614345147923,
+      "y_final": -0.1798003749325277,
+      "grad_norm_final": 0.8995003784328057,
+      "residual_norm_final": null,
+      "sum_phi_raw": 16679.967914857007,
+      "sum_s": 6393.382607356858
+    },
+    "fira_limiter": {
+      "x_final": -0.0172785841881159,
+      "y_final": 0.1834505873418312,
+      "grad_norm_final": 0.917415663357192,
+      "residual_norm_final": null,
+      "sum_phi_raw": 14427.813977446216,
+      "sum_s": 14427.813977446216
+    },
+    "becr_fira_toy": {
+      "x_final": -0.06080943748479011,
+      "y_final": -0.011497184609808529,
+      "grad_norm_final": 0.08368045790993886,
+      "residual_norm_final": 0.010326958216696736,
+      "sum_phi_raw": 19068.23762981463,
+      "sum_s": 6828.134490036488
+    },
+    "wrong_units_naive_ef": {
+      "x_final": 0.06666925793067938,
+      "y_final": 0.015062180288673725,
+      "grad_norm_final": 0.10058092179553854,
+      "residual_norm_final": 0.0006162155520926935,
+      "sum_phi_raw": 18927.707330684778,
+      "sum_s": 6778.090665878074
+    }
+  }
+}

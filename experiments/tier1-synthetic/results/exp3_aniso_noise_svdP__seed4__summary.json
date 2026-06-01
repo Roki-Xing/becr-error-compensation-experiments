@@ -1,0 +1,63 @@
+{
+  "exp_name": "exp3_aniso_noise_svdP",
+  "d": 120,
+  "steps": 2500,
+  "batch_size": 20,
+  "seed": 4,
+  "optimizers": {
+    "proj_sgd": {
+      "grad_norm_final": 0.04000380523762952,
+      "grad_par_norm_final": 0.015076381782441845,
+      "grad_perp_norm_final": 0.03705411105181516,
+      "residual_norm_final": null,
+      "sum_phi_raw": 0.0,
+      "sum_s": 0.0,
+      "f_final": 0.0007077735043895101
+    },
+    "fira_raw": {
+      "grad_norm_final": 7.591238099113179,
+      "grad_par_norm_final": 0.3441375696632281,
+      "grad_perp_norm_final": 7.583433602964673,
+      "residual_norm_final": null,
+      "sum_phi_raw": 12068.50135009727,
+      "sum_s": 12068.50135009727,
+      "f_final": 5.771615691595488
+    },
+    "fira_clipped": {
+      "grad_norm_final": 16.422703874136825,
+      "grad_par_norm_final": 0.2793816705560501,
+      "grad_perp_norm_final": 16.420327293319886,
+      "residual_norm_final": null,
+      "sum_phi_raw": 16950.402506004884,
+      "sum_s": 13674.21905882504,
+      "f_final": 26.976992244596342
+    },
+    "becr_fira": {
+      "grad_norm_final": 0.08905186417015493,
+      "grad_par_norm_final": 0.06501117164495374,
+      "grad_perp_norm_final": 0.0608587058154385,
+      "residual_norm_final": 0.10662105425037076,
+      "sum_phi_raw": 40989.492961929616,
+      "sum_s": 22815.826611983593,
+      "f_final": 0.003748054890622782
+    },
+    "rho_no_lower_bound": {
+      "grad_norm_final": 0.5658841926588568,
+      "grad_par_norm_final": 0.1617188669278268,
+      "grad_perp_norm_final": 0.5422839916323792,
+      "residual_norm_final": 0.0,
+      "sum_phi_raw": 16865.003904665547,
+      "sum_s": 13226.624259304046,
+      "f_final": 0.0379511693958064
+    },
+    "coupled_unbounded": {
+      "grad_norm_final": 383.45843303604187,
+      "grad_par_norm_final": 383.4584017420713,
+      "grad_perp_norm_final": 0.154918923411325,
+      "residual_norm_final": 145.97480606147295,
+      "sum_phi_raw": 222.01204476033013,
+      "sum_s": 413.24342776973174,
+      "f_final": 14708.511120877896
+    }
+  }
+}

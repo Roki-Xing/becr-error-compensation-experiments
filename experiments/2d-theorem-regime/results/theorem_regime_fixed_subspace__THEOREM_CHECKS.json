@@ -1,0 +1,11 @@
+{
+  "eta_a": 0.5,
+  "two_eps_a": 2.0,
+  "ok_eta_a_lt_2epsa": true,
+  "R": 1.0,
+  "r_star": 1.0,
+  "r0": 1.0,
+  "M0": 0.25,
+  "eta_b_M0": 0.125,
+  "ok_eta_b_M0_le_half": true
+}

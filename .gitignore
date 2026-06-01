@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+*.partial
+data/
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store

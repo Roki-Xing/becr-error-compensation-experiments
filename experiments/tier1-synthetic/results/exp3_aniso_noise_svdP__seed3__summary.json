@@ -1,0 +1,63 @@
+{
+  "exp_name": "exp3_aniso_noise_svdP",
+  "d": 120,
+  "steps": 2500,
+  "batch_size": 20,
+  "seed": 3,
+  "optimizers": {
+    "proj_sgd": {
+      "grad_norm_final": 0.03497404768390613,
+      "grad_par_norm_final": 0.012517051892609354,
+      "grad_perp_norm_final": 0.032657425240117506,
+      "residual_norm_final": null,
+      "sum_phi_raw": 0.0,
+      "sum_s": 0.0,
+      "f_final": 0.0005839135952389801
+    },
+    "fira_raw": {
+      "grad_norm_final": 5.483587843835548,
+      "grad_par_norm_final": 0.18502949845565267,
+      "grad_perp_norm_final": 5.480465283692823,
+      "residual_norm_final": null,
+      "sum_phi_raw": 11740.488978078509,
+      "sum_s": 11740.488978078509,
+      "f_final": 3.0108526416968155
+    },
+    "fira_clipped": {
+      "grad_norm_final": 0.5904205907251334,
+      "grad_par_norm_final": 0.19710926114565733,
+      "grad_perp_norm_final": 0.5565468651630594,
+      "residual_norm_final": null,
+      "sum_phi_raw": 16547.647665820114,
+      "sum_s": 13063.240064077396,
+      "f_final": 0.038522342883616924
+    },
+    "becr_fira": {
+      "grad_norm_final": 0.11179329096017457,
+      "grad_par_norm_final": 0.0800388598127252,
+      "grad_perp_norm_final": 0.07804819551780283,
+      "residual_norm_final": 0.11560544904827938,
+      "sum_phi_raw": 40348.253586009014,
+      "sum_s": 22828.165390325885,
+      "f_final": 0.005353077244134586
+    },
+    "rho_no_lower_bound": {
+      "grad_norm_final": 9.41054887045752,
+      "grad_par_norm_final": 9.410211495657423,
+      "grad_perp_norm_final": 0.07968469279722734,
+      "residual_norm_final": 0.3899889591744501,
+      "sum_phi_raw": 15979.108790880517,
+      "sum_s": 12685.458599621734,
+      "f_final": 8.866161626566091
+    },
+    "coupled_unbounded": {
+      "grad_norm_final": 14.540039354033862,
+      "grad_par_norm_final": 14.50219535695587,
+      "grad_perp_norm_final": 1.048367419152801,
+      "residual_norm_final": 4.52846739710029,
+      "sum_phi_raw": 1050.9702581511995,
+      "sum_s": 1096.1624694008383,
+      "f_final": 36.02585844681997
+    }
+  }
+}

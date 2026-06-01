@@ -1,0 +1,36 @@
+{
+  "exp_name": "exp3_anisotropic_noise_svd_projection",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "methods": {
+    "proj_sgd": {
+      "grad_norm_final_mean": 0.04038764362495971,
+      "grad_norm_final_std": 0.0035410974313648336
+    },
+    "fira_raw": {
+      "grad_norm_final_mean": 5.75557290895094,
+      "grad_norm_final_std": 4.719387348714569
+    },
+    "fira_clipped": {
+      "grad_norm_final_mean": 3.8028757666714457,
+      "grad_norm_final_std": 7.0754296522491185
+    },
+    "becr_fira": {
+      "grad_norm_final_mean": 0.12136492676941386,
+      "grad_norm_final_std": 0.029372399769753987
+    },
+    "rho_no_lower_bound": {
+      "grad_norm_final_mean": 2.5335224270063508,
+      "grad_norm_final_std": 3.8521602747871073
+    },
+    "coupled_unbounded": {
+      "grad_norm_final_mean": 273.6698141844799,
+      "grad_norm_final_std": 254.37937687187065
+    }
+  }
+}

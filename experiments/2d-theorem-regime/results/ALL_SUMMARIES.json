@@ -1,0 +1,52 @@
+[
+  {
+    "exp_name": "theorem_regime_fixed_subspace",
+    "quad": {
+      "a": 1.0,
+      "b": 1.0
+    },
+    "steps": 600,
+    "optimizers": {
+      "proj_sgd": {
+        "x_final": 2.409919865102884e-181,
+        "y_final": 1.0,
+        "grad_norm_final": 1.0,
+        "residual_norm_final": null,
+        "sum_phi_raw": 0.0,
+        "sum_s": 0.0
+      },
+      "fira_raw": {
+        "x_final": 1.3573540178138776e-180,
+        "y_final": 0.5000000000000001,
+        "grad_norm_final": 0.5000000000000001,
+        "residual_norm_final": null,
+        "sum_phi_raw": 1.318252858503685,
+        "sum_s": 1.318252858503685
+      },
+      "fira_clipped": {
+        "x_final": 1.3573540178138776e-180,
+        "y_final": 3.2786918886947376e-28,
+        "grad_norm_final": 3.2786918886947376e-28,
+        "residual_norm_final": null,
+        "sum_phi_raw": 1.318252858503685,
+        "sum_s": 120.12204776989333
+      },
+      "becr_fira_toy": {
+        "x_final": 1.3573540178138776e-180,
+        "y_final": 1.765370747287984e-32,
+        "grad_norm_final": 1.765370747287984e-32,
+        "residual_norm_final": 2.2922242527886129e-32,
+        "sum_phi_raw": 1.318252858503685,
+        "sum_s": 120.12204776989333
+      },
+      "wrong_units_naive_ef": {
+        "x_final": 1.3573540178138776e-180,
+        "y_final": 6.897620681712997e-15,
+        "grad_norm_final": 6.897620681712997e-15,
+        "residual_norm_final": 3.857400189169796e-15,
+        "sum_phi_raw": 1.318252858503685,
+        "sum_s": 120.12204776989333
+      }
+    }
+  }
+]

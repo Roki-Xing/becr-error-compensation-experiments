@@ -1,0 +1,63 @@
+{
+  "exp_name": "exp2_stale_refresh_K50",
+  "d": 200,
+  "steps": 2000,
+  "batch_size": 1,
+  "seed": 0,
+  "optimizers": {
+    "proj_sgd": {
+      "grad_norm_final": 0.034372084302000484,
+      "grad_par_norm_final": 0.009797568861459926,
+      "grad_perp_norm_final": 0.03294613518561439,
+      "residual_norm_final": null,
+      "sum_phi_raw": 0.0,
+      "sum_s": 0.0,
+      "f_final": 0.024722532492319583
+    },
+    "fira_raw": {
+      "grad_norm_final": 0.01486266353012861,
+      "grad_par_norm_final": 0.0042249457325773425,
+      "grad_perp_norm_final": 0.014249512299254018,
+      "residual_norm_final": null,
+      "sum_phi_raw": 50.17149433820382,
+      "sum_s": 50.17149433820382,
+      "f_final": 0.005145192753783772
+    },
+    "fira_clipped": {
+      "grad_norm_final": 0.0004150310648198996,
+      "grad_par_norm_final": 0.00017757106006742639,
+      "grad_perp_norm_final": 0.0003751257167831475,
+      "residual_norm_final": null,
+      "sum_phi_raw": 22.077574414321653,
+      "sum_s": 401.0204647501181,
+      "f_final": 5.415126050699514e-06
+    },
+    "becr_fira": {
+      "grad_norm_final": 0.0004137196520469129,
+      "grad_par_norm_final": 0.0001772403512904164,
+      "grad_perp_norm_final": 0.00037383125653731584,
+      "residual_norm_final": 0.00037523337864994066,
+      "sum_phi_raw": 22.072850693137887,
+      "sum_s": 401.0204647501181,
+      "f_final": 5.391752019930348e-06
+    },
+    "rho_no_lower_bound": {
+      "grad_norm_final": 0.0004279433407373007,
+      "grad_par_norm_final": 0.00013507430762503016,
+      "grad_perp_norm_final": 0.0004060670317829559,
+      "residual_norm_final": 1.6307402578500096,
+      "sum_phi_raw": 28.63037976500149,
+      "sum_s": 406.5608557149404,
+      "f_final": 4.725987235488193e-06
+    },
+    "coupled_unbounded": {
+      "grad_norm_final": 0.0004279433407373007,
+      "grad_par_norm_final": 0.00013507430762503016,
+      "grad_perp_norm_final": 0.0004060670317829559,
+      "residual_norm_final": 1.6307402578500096,
+      "sum_phi_raw": 28.63037976500149,
+      "sum_s": 406.5608557149404,
+      "f_final": 4.725987235488193e-06
+    }
+  }
+}

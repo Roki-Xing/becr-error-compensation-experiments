@@ -1,0 +1,23 @@
+[run] mode=proj_only seed=1 max_steps=1500 device=cuda
+[done] mode=proj_only seed=1 valid_ppl=457.10 time=49.1s
+[run] mode=fira_raw seed=1 max_steps=1500 device=cuda
+[done] mode=fira_raw seed=1 valid_ppl=317.90 time=52.2s
+[run] mode=fira_clipped seed=1 max_steps=1500 device=cuda
+[done] mode=fira_clipped seed=1 valid_ppl=440.88 time=46.8s
+[run] mode=becr seed=1 max_steps=1500 device=cuda
+[done] mode=becr seed=1 valid_ppl=441.01 time=34.8s
+[run] mode=residual_no_bound seed=1 max_steps=1500 device=cuda
+[done] mode=residual_no_bound seed=1 valid_ppl=5184705528587072045056.00 time=35.7s
+[run] mode=adamw_full seed=2 max_steps=1500 device=cuda
+[done] mode=adamw_full seed=2 valid_ppl=121.54 time=16.0s
+[run] mode=proj_only seed=2 max_steps=1500 device=cuda
+[done] mode=proj_only seed=2 valid_ppl=461.47 time=26.5s
+[run] mode=fira_raw seed=2 max_steps=1500 device=cuda
+[done] mode=fira_raw seed=2 valid_ppl=315.79 time=30.5s
+[run] mode=fira_clipped seed=2 max_steps=1500 device=cuda
+[done] mode=fira_clipped seed=2 valid_ppl=441.71 time=30.1s
+[run] mode=becr seed=2 max_steps=1500 device=cuda
+[done] mode=becr seed=2 valid_ppl=442.27 time=35.7s
+[run] mode=residual_no_bound seed=2 max_steps=1500 device=cuda
+[done] mode=residual_no_bound seed=2 valid_ppl=5184705528587072045056.00 time=35.2s
+Done. Wrote to /root/becr_runs/error_compensation_wikitext2_20260512_214646 seeds= [0, 1, 2] modes= ['adamw_full', 'proj_only', 'fira_raw', 'fira_clipped', 'becr', 'residual_no_bound'] max_steps= 1500

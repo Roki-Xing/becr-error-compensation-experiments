@@ -1,0 +1,63 @@
+{
+  "exp_name": "exp1_diag_fixed_stale",
+  "d": 500,
+  "steps": 3000,
+  "batch_size": 1,
+  "seed": 0,
+  "optimizers": {
+    "proj_sgd": {
+      "grad_norm_final": 21.908902300206645,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 21.908902300206645,
+      "residual_norm_final": null,
+      "sum_phi_raw": 0.0,
+      "sum_s": 0.0,
+      "f_final": 240.0
+    },
+    "fira_raw": {
+      "grad_norm_final": 4.003720390058973,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 4.003720390058973,
+      "residual_norm_final": null,
+      "sum_phi_raw": 3.066788352279309,
+      "sum_s": 3.066788352279309,
+      "f_final": 8.014888480886986
+    },
+    "fira_clipped": {
+      "grad_norm_final": 5.281689833429337e-137,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 5.281689833429337e-137,
+      "residual_norm_final": null,
+      "sum_phi_raw": 3.066788352279309,
+      "sum_s": 601.3412998344919,
+      "f_final": 1.394812374827541e-273
+    },
+    "becr_fira": {
+      "grad_norm_final": 8.958616746768747e-159,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 8.958616746768747e-159,
+      "residual_norm_final": 1.1632246797062345e-158,
+      "sum_phi_raw": 3.066788352279309,
+      "sum_s": 601.3412998344919,
+      "f_final": 4.0128407e-317
+    },
+    "rho_no_lower_bound": {
+      "grad_norm_final": 4.754190145339898,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 4.754190145339898,
+      "residual_norm_final": 14239.80875656749,
+      "sum_phi_raw": 3.066788352279309,
+      "sum_s": 601.3412998344919,
+      "f_final": 11.301161969023498
+    },
+    "coupled_unbounded": {
+      "grad_norm_final": 4.754190145339898,
+      "grad_par_norm_final": 0.0,
+      "grad_perp_norm_final": 4.754190145339898,
+      "residual_norm_final": 14239.80875656749,
+      "sum_phi_raw": 3.066788352279309,
+      "sum_s": 601.3412998344919,
+      "f_final": 11.301161969023498
+    }
+  }
+}
