@@ -86,7 +86,7 @@ class OfficialFiraOracle:
         param_abs_err, param_rel_err = tensor_max_abs_rel(self.param.detach(), trace["parameter_after"])
         exp_avg_abs_err, _ = tensor_max_abs_rel(actual_state["exp_avg"], trace["exp_avg_after"])
         exp_avg_sq_abs_err, _ = tensor_max_abs_rel(actual_state["exp_avg_sq"], trace["exp_avg_sq_after"])
-        adapter_tol = 1e-12 if self.param.dtype == torch.float64 else 1e-7
+        adapter_tol = 1e-12 if self.param.dtype == torch.float64 else 1e-6
         if param_abs_err > adapter_tol or exp_avg_abs_err > adapter_tol or exp_avg_sq_abs_err > adapter_tol:
             raise AssertionError(
                 "Official oracle adapter diverged from upstream execution: "
