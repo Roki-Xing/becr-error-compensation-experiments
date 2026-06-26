@@ -93,6 +93,7 @@ def test_exact_fira_limiter_active_parity():
     atol, rtol = _tol(result["config"].dtype)
     assert any(t["limiter_triggered"] for t in result["oracle_traces"])
     assert any(t["limiter_triggered"] for t in result["candidate_traces"])
+    assert result["comparison"]["first_mismatch"] is None
     assert errors["limiter_factor"]["abs"] <= atol
     assert errors["limiter_factor"]["rel"] <= rtol
 
@@ -101,9 +102,15 @@ def test_exact_fira_weight_decay_parity():
     result = _result("shape_2x2_rank2_gap5_fp32_wd")
     errors = result["comparison"]["max_errors"]
     atol, rtol = _tol(result["config"].dtype)
+    assert result["comparison"]["first_mismatch"] is None
     assert any(float(torch.norm(t["weight_decay_contribution"]).item()) > 0 for t in result["oracle_traces"])
     assert errors["weight_decay_contribution"]["abs"] <= atol
     assert errors["weight_decay_contribution"]["rel"] <= rtol
+
+
+def test_exact_fira_fp32_active_fixture_has_no_semantic_mismatch():
+    result = _result("shape_4x3_rank2_gap5_fp32_wd_limiter_active")
+    assert result["comparison"]["first_mismatch"] is None
 
 
 def test_exact_fira_state_survives_refresh():

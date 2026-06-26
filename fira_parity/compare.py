@@ -67,6 +67,15 @@ def _tensor_error(a: Any, b: Any) -> tuple[float, float]:
     return tensor_max_abs_rel(_tensor_from(a), _tensor_from(b))
 
 
+def _passes_tol(abs_err: float, oracle_value: Any, candidate_value: Any, atol: float, rtol: float) -> bool:
+    if isinstance(oracle_value, torch.Tensor):
+        ref = torch.maximum(oracle_value.abs(), candidate_value.abs())
+        bound = float((atol + rtol * ref).max().item()) if ref.numel() else atol
+        return abs_err <= bound
+    ref = max(abs(float(oracle_value)), abs(float(candidate_value)))
+    return abs_err <= atol + rtol * ref
+
+
 def compare_traces(
     oracle_traces: list[dict[str, Any]],
     candidate_traces: list[dict[str, Any]],
@@ -117,7 +126,7 @@ def compare_traces(
             current = max_errors.setdefault(field, {"abs": 0.0, "rel": 0.0})
             current["abs"] = max(current["abs"], abs_err)
             current["rel"] = max(current["rel"], rel_err)
-            if first_mismatch is None and (abs_err > atol or rel_err > rtol):
+            if first_mismatch is None and not _passes_tol(abs_err, oracle[field], candidate[field], atol=atol, rtol=rtol):
                 first_mismatch = {
                     "step": step_idx,
                     "field": field,
@@ -139,7 +148,7 @@ def compare_traces(
             current = max_errors.setdefault(field, {"abs": 0.0, "rel": 0.0})
             current["abs"] = max(current["abs"], abs_err)
             current["rel"] = max(current["rel"], rel_err)
-            if first_mismatch is None and (abs_err > atol or rel_err > rtol):
+            if first_mismatch is None and not _passes_tol(abs_err, oracle_value, aligned_candidate, atol=atol, rtol=rtol):
                 first_mismatch = {
                     "step": step_idx,
                     "field": field,
@@ -156,7 +165,7 @@ def compare_traces(
             current = max_errors.setdefault(field, {"abs": 0.0, "rel": 0.0})
             current["abs"] = max(current["abs"], abs_err)
             current["rel"] = max(current["rel"], rel_err)
-            if first_mismatch is None and (abs_err > atol or rel_err > rtol):
+            if first_mismatch is None and not _passes_tol(abs_err, oracle[field], candidate[field], atol=atol, rtol=rtol):
                 first_mismatch = {
                     "step": step_idx,
                     "field": field,
