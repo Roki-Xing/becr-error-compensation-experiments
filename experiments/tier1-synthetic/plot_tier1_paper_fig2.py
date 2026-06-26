@@ -29,8 +29,8 @@ def main() -> None:
     order = ["proj_sgd", "fira_raw", "fira_clipped", "becr_fira", "rho_no_lower_bound", "coupled_unbounded"]
     label = {
         "proj_sgd": "ProjSGD",
-        "fira_raw": "Fira (raw)",
-        "fira_clipped": "Fira (clipped)",
+        "fira_raw": "Fira-style coord (raw)",
+        "fira_clipped": "Fira-style coord (clipped)",
         "becr_fira": "BECR",
         "rho_no_lower_bound": "No-lower (capped)",
         "coupled_unbounded": "Coupled (unbounded)",

@@ -1,0 +1,122 @@
+{
+  "fixture_id": "shape_4x3_rank2_gap5_fp64_100step",
+  "dtype": "float64",
+  "steps": 100,
+  "refresh_steps": [
+    1,
+    6,
+    11,
+    16,
+    21,
+    26,
+    31,
+    36,
+    41,
+    46,
+    51,
+    56,
+    61,
+    66,
+    71,
+    76,
+    81,
+    86,
+    91,
+    96
+  ],
+  "first_mismatch": "none",
+  "max_errors": {
+    "raw_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "invariant_projector_after": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "reconstructed_projected_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "remainder_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "raw_recovery_scale": {
+      "abs": 8.881784197001252e-16,
+      "rel": 3.872663363437036e-16
+    },
+    "applied_recovery_scale": {
+      "abs": 2.220446049250313e-16,
+      "rel": 5.889717304890163e-16
+    },
+    "candidate_recovery_update": {
+      "abs": 8.881784197001252e-16,
+      "rel": 5.532186190627624e-16
+    },
+    "effective_recovery_update": {
+      "abs": 2.220446049250313e-16,
+      "rel": 5.346907824831711e-16
+    },
+    "complete_update_before_weight_decay": {
+      "abs": 1.7763568394002505e-15,
+      "rel": 2.4428692330099188e-14
+    },
+    "weight_decay_contribution": {
+      "abs": 1.0164395367051604e-20,
+      "rel": 4.459962449792655e-16
+    },
+    "complete_applied_update": {
+      "abs": 5.551115123125783e-17,
+      "rel": 2.3978542361920362e-14
+    },
+    "parameter_before": {
+      "abs": 1.1102230246251565e-16,
+      "rel": 4.0839604567283437e-16
+    },
+    "parameter_after": {
+      "abs": 1.1102230246251565e-16,
+      "rel": 4.0839604567283437e-16
+    },
+    "projected_gradient": {
+      "abs": 1.4210854715202004e-14,
+      "rel": 1.8544640536049552e-14
+    },
+    "exp_avg_before": {
+      "abs": 2.6645352591003757e-15,
+      "rel": 5.3041882669616226e-14
+    },
+    "exp_avg_after": {
+      "abs": 2.6645352591003757e-15,
+      "rel": 5.4075166098245054e-14
+    },
+    "exp_avg_sq_before": {
+      "abs": 1.7763568394002505e-15,
+      "rel": 6.967882768257993e-16
+    },
+    "exp_avg_sq_after": {
+      "abs": 1.7763568394002505e-15,
+      "rel": 6.158127453753867e-16
+    },
+    "normalized_low_rank_update": {
+      "abs": 3.552713678800501e-15,
+      "rel": 9.55142752436441e-14
+    },
+    "bias_correction1": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "bias_correction2": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "limiter_factor": {
+      "abs": 1.3322676295501878e-15,
+      "rel": 3.5597788993559646e-16
+    },
+    "step_size": {
+      "abs": 0.0,
+      "rel": 0.0
+    }
+  }
+}

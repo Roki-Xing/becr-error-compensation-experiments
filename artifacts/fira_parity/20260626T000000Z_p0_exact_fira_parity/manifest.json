@@ -1,0 +1,34 @@
+{
+  "project_commit": "32b286e0f769231b4ec54655c5217bd2aeafd0bd",
+  "project_branch": "codex/p0-exact-fira-parity",
+  "project_status": "## codex/p0-exact-fira-parity\n M README.md\n M experiments/cifar10-small-cnn/plot_cifar10_results.py\n M experiments/cifar10-small-cnn/run_cifar10_coordproj_mechanism.py\n M experiments/mnist-mlp/plot_mnist_results.py\n M experiments/mnist-mlp/run_mnist_mlp_coordproj_mechanism.py\n M experiments/tier1-synthetic/plot_tier1_paper_fig2.py\n M experiments/wikitext2-tinygpt/plot_wikitext2_results.py\n M experiments/wikitext2-tinygpt/run_wikitext2_transformer_coordproj_mechanism.py\n?? .github/\n?? docs/FIRA_LABEL_AUDIT.md\n?? docs/FIRA_PARITY_SPEC.md\n?? fira_parity/\n?? pytest.ini\n?? requirements-dev.txt\n?? tests/\n?? third_party/",
+  "task_id": "P0-EXACT-FIRA-PARITY-001",
+  "timestamp": "2026-06-26T10:26:42.434422+00:00",
+  "fixture": {
+    "fixture_id": "shape_4x3_rank2_gap5_fp64_100step",
+    "shape": [
+      4,
+      3
+    ],
+    "rank": 2,
+    "update_proj_gap": 5,
+    "lr": 0.007,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-06,
+    "weight_decay": 0.01,
+    "correct_bias": true,
+    "alpha": 1.0,
+    "proj_type": "std",
+    "dtype": "float64",
+    "steps": 100,
+    "seed": 53,
+    "expect_limiter": true
+  },
+  "official_fira_repository": "https://github.com/xichen-fy/Fira",
+  "official_fira_commit": "5af6a9860b633138f12837ad25e528b7d54217eb",
+  "official_fira_license": "Apache License 2.0",
+  "command": "python -m fira_parity.runner --fixture shape_4x3_rank2_gap5_fp64_100step --out artifacts/fira_parity/20260626T000000Z_p0_exact_fira_parity"
+}

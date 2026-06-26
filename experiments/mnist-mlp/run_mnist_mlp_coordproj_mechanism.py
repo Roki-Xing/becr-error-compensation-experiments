@@ -62,6 +62,8 @@ class CoordProjConfig:
 
 
 class CoordProjRecoveryAdam(torch.optim.Optimizer):
+    """Fira-style coordinate diagnostic only; not exact official Fira."""
+
     def __init__(
         self,
         params,

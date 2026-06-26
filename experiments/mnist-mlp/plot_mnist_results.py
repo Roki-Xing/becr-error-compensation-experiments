@@ -38,8 +38,8 @@ def main() -> None:
     label = {
         "adamw_full": "AdamW (full)",
         "proj_only": "Proj-only",
-        "fira_raw": "Fira (raw)",
-        "fira_clipped": "Fira (clipped)",
+        "fira_raw": "Fira-style coord (raw)",
+        "fira_clipped": "Fira-style coord (clipped)",
         "becr": "BECR",
         "rho_no_lower_bound": "Residual (no-lower, capped)",
         "coupled_unbounded": "Coupled EF (rho=phi_raw)",

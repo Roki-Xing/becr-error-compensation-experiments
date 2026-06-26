@@ -13,6 +13,10 @@ does not claim optimizer superiority over full AdamW. It tests:
 4. Whether the same scale and residual diagnostics appear in small neural
    training loops.
 
+Current `fira_raw` / `fira_clipped` entries in this repository are
+Fira-style coordinate diagnostics, not parity-validated official Fira
+baselines.
+
 ## Repository Layout
 
 ```text
