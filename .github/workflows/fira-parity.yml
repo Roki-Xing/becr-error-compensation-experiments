@@ -18,3 +18,5 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Run parity tests
         run: python -m pytest -q
+      - name: Smoke-generate parity artifacts
+        run: python -m fira_parity.artifact_check --artifact-dir artifacts/fira_parity/20260626T000000Z_p0_exact_fira_parity --smoke-generate
