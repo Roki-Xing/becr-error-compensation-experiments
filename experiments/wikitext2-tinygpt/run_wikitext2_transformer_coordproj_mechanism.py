@@ -226,6 +226,8 @@ class CoordProjRecoveryAdam(torch.optim.Optimizer):
     - Adam moments maintained only on the projected coordinates
     - Fira-style scalar recovery scale phi_raw = ||psi||/(||R||+eps_scale)
     - orthogonal update uses either raw scale, clipped scale, or BECR residual compensation
+
+    This is a Fira-style coordinate diagnostic, not exact official Fira.
     """
 
     def __init__(

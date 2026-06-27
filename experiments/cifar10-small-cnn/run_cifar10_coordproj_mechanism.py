@@ -75,7 +75,8 @@ class CoordProjRecoveryAdam(torch.optim.Optimizer):
     - Fira-style scalar recovery scale phi_raw = ||psi||/(||R||+eps_scale)
     - orthogonal update uses either raw scale, clipped scale, or BECR residual compensation
 
-    This is intentionally diagnostic, not tuned for SOTA accuracy.
+    This is intentionally diagnostic, not tuned for SOTA accuracy, and not an
+    exact implementation of official Fira.
     """
 
     def __init__(

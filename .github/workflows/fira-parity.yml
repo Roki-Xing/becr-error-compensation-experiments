@@ -1,0 +1,22 @@
+name: fira-parity
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run parity tests
+        run: python -m pytest -q
+      - name: Smoke-generate parity artifacts
+        run: python -m fira_parity.artifact_check --artifact-dir artifacts/fira_parity/20260626T000000Z_p0_exact_fira_parity --smoke-generate
