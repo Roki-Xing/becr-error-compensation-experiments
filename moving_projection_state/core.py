@@ -321,6 +321,7 @@ class StaticSchedule:
     def __init__(self, bases: list[np.ndarray], *, scheduler_factory_id: str):
         self._bases = [np.asarray(b, dtype=float).copy() for b in bases]
         self.scheduler_factory_id = str(scheduler_factory_id)
+        self.scheduler_object_id = str(uuid.uuid4())
         self.steps = 0
 
     def basis(self, step_index: int) -> np.ndarray:
@@ -399,7 +400,7 @@ def run_trace(
         "rng_seed": int(rng_seed),
         "noise_hash": noise_hash,
         "scheduler_factory_id": str(scheduler_factory_id),
-        "scheduler_object_id": str(id(scheduler)),
+        "scheduler_object_id": scheduler.scheduler_object_id,
         "code_commit": _git_commit(),
         "parent_task_id": parent_task_id,
     }

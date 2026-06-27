@@ -19,4 +19,4 @@ jobs:
       - name: Run unit tests
         run: python -m pytest -q
       - name: Smoke-generate moving projection artifacts
-        run: python experiments/tier1-synthetic/run_moving_projection_state_suite.py
+        run: python experiments/tier1-synthetic/run_moving_projection_state_suite.py --output-root /tmp/moving_projection_smoke --run-id ci_smoke
