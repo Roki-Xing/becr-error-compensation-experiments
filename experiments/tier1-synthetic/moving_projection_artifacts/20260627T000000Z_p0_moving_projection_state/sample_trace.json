@@ -635,9 +635,9 @@
     ],
     "rng_seed": 11,
     "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-    "scheduler_factory_id": "full_residual_current_projection-79f753f9-5b82-4eab-bbaa-724b7f49af1c",
-    "scheduler_object_id": "139028860699136",
-    "code_commit": "1499916f656fbb8b6971529d4f14d0586cd9d2d0",
+    "scheduler_factory_id": "full_residual_current_projection-9375b998-7b70-4f58-8f44-9d3010ff27d4",
+    "scheduler_object_id": "3566fba9-7f59-4aa1-a31e-1f73e00aef2d",
+    "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
     "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
   },
   "noise_bank": [

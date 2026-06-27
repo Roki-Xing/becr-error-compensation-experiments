@@ -639,9 +639,9 @@
       ],
       "rng_seed": 11,
       "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-      "scheduler_factory_id": "state_reset_explicit-7db66629-fc2b-49c4-88a6-218d7c30b709",
-      "scheduler_object_id": "139028860879264",
-      "code_commit": "1499916f656fbb8b6971529d4f14d0586cd9d2d0",
+      "scheduler_factory_id": "state_reset_explicit-53b648eb-b4a5-4a73-bae2-9e059e6d7e9e",
+      "scheduler_object_id": "ab41391c-3c4b-49a6-a027-9f28ede6b77f",
+      "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
       "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
     },
     "noise_bank": [
@@ -1310,9 +1310,9 @@
       ],
       "rng_seed": 11,
       "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-      "scheduler_factory_id": "official_fira_carry-81b470fd-06a4-4836-8f0f-098fa854225b",
-      "scheduler_object_id": "139028860699136",
-      "code_commit": "1499916f656fbb8b6971529d4f14d0586cd9d2d0",
+      "scheduler_factory_id": "official_fira_carry-cf5befec-0a11-4c6b-8ee8-719b9fa938dd",
+      "scheduler_object_id": "89335666-e1ab-4ec0-8cb7-45f309c95fe7",
+      "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
       "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
     },
     "noise_bank": [
@@ -1981,9 +1981,9 @@
       ],
       "rng_seed": 11,
       "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-      "scheduler_factory_id": "projection_aware_transport-eca3189a-dbf4-4ad2-9b23-6cb4460e9aaa",
-      "scheduler_object_id": "139028470273984",
-      "code_commit": "1499916f656fbb8b6971529d4f14d0586cd9d2d0",
+      "scheduler_factory_id": "projection_aware_transport-4da1a6e9-132a-4214-afef-30753e65715e",
+      "scheduler_object_id": "a258bc63-fe2f-4d4e-b2b8-c51cb8e7ac94",
+      "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
       "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
     },
     "noise_bank": [
@@ -2652,9 +2652,9 @@
       ],
       "rng_seed": 11,
       "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-      "scheduler_factory_id": "full_residual_current_projection-79f753f9-5b82-4eab-bbaa-724b7f49af1c",
-      "scheduler_object_id": "139028860699136",
-      "code_commit": "1499916f656fbb8b6971529d4f14d0586cd9d2d0",
+      "scheduler_factory_id": "full_residual_current_projection-9375b998-7b70-4f58-8f44-9d3010ff27d4",
+      "scheduler_object_id": "3566fba9-7f59-4aa1-a31e-1f73e00aef2d",
+      "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
       "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
     },
     "noise_bank": [
