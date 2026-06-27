@@ -15,8 +15,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pytest
+          pip install -r requirements-dev.txt
       - name: Run unit tests
         run: python -m pytest -q
-      - name: Smoke-generate moving projection artifacts
-        run: python experiments/tier1-synthetic/run_moving_projection_state_suite.py --output-root /tmp/moving_projection_smoke --run-id ci_smoke
+      - name: Smoke-check moving projection artifacts
+        run: python -m moving_projection_state.artifact_check --artifact-dir experiments/tier1-synthetic/moving_projection_artifacts/20260627T000000Z_p0_moving_projection_state --smoke-generate

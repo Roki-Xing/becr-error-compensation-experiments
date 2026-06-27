@@ -31,11 +31,18 @@ def main() -> None:
         default="P0-MOVING-PROJECTION-STATE-002",
         help="Parent task id recorded in manifests.",
     )
+    parser.add_argument(
+        "--parent-pr",
+        type=str,
+        default="#2",
+        help="Parent PR identifier recorded in manifests.",
+    )
     args = parser.parse_args()
     out_dir = generate_artifacts(
         output_root=args.output_root,
         run_id=args.run_id,
         parent_task_id=args.parent_task_id,
+        parent_pr=args.parent_pr,
     )
     print(f"Wrote moving-projection artifacts to {out_dir}")
 

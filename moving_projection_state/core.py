@@ -14,6 +14,8 @@ MODE_SPECS = {
     "state_reset_explicit": {
         "projection_mode": "provided_schedule",
         "state_transport_mode": "reset_on_refresh",
+        "first_moment_mode": "reset_on_refresh",
+        "second_moment_mode": "reset_on_refresh",
         "residual_mode": "current_projection_compensated",
         "explicit_reset": True,
         "use_residual": True,
@@ -21,6 +23,8 @@ MODE_SPECS = {
     "official_fira_carry": {
         "projection_mode": "provided_schedule",
         "state_transport_mode": "carry_unchanged",
+        "first_moment_mode": "carry_unchanged",
+        "second_moment_mode": "carry_unchanged",
         "residual_mode": "none",
         "explicit_reset": False,
         "use_residual": False,
@@ -28,6 +32,8 @@ MODE_SPECS = {
     "projection_aware_transport": {
         "projection_mode": "provided_schedule",
         "state_transport_mode": "basis_overlap_transport",
+        "first_moment_mode": "basis_overlap_transport",
+        "second_moment_mode": "squared_basis_overlap_transport",
         "residual_mode": "none",
         "explicit_reset": False,
         "use_residual": False,
@@ -35,6 +41,8 @@ MODE_SPECS = {
     "full_residual_current_projection": {
         "projection_mode": "provided_schedule",
         "state_transport_mode": "basis_overlap_transport",
+        "first_moment_mode": "basis_overlap_transport",
+        "second_moment_mode": "squared_basis_overlap_transport",
         "residual_mode": "current_projection_compensated",
         "explicit_reset": False,
         "use_residual": True,
@@ -45,6 +53,8 @@ REQUIRED_MANIFEST_FIELDS = {
     "mode",
     "projection_mode",
     "state_transport_mode",
+    "first_moment_mode",
+    "second_moment_mode",
     "residual_mode",
     "reset_events",
     "basis_overlap",
@@ -52,6 +62,7 @@ REQUIRED_MANIFEST_FIELDS = {
     "noise_hash",
     "scheduler_factory_id",
     "code_commit",
+    "parent_pr",
     "parent_task_id",
 }
 
@@ -144,6 +155,7 @@ def _transport_state(
         state["v"] = _pad_or_trim(state["v"], k)
     if state["e"].shape[0] != d:
         state["e"] = _pad_or_trim(state["e"], d)
+    overlap = None if prev_P is None else (np.asarray(P, dtype=dtype).T @ np.asarray(prev_P, dtype=dtype))
     if prev_P is None:
         return state, False
     if not refresh_happened:
@@ -166,7 +178,6 @@ def _transport_state(
             "prev_u_perp_norm": float(state["prev_u_perp_norm"]),
         }, False
     if transport_mode == "basis_overlap_transport":
-        overlap = np.asarray(P, dtype=dtype).T @ np.asarray(prev_P, dtype=dtype)
         m_new = overlap @ state["m"]
         v_new = (overlap * overlap) @ state["v"]
         return {
@@ -211,8 +222,32 @@ def run_single_step(
         "e": np.asarray(state["e"], dtype=dtype).copy(),
         "prev_u_perp_norm": float(state["prev_u_perp_norm"]),
     }
+    overlap = None if prev_P is None else (np.asarray(P, dtype=dtype).T @ np.asarray(prev_P, dtype=dtype))
+    spec = MODE_SPECS[mode]
+    if prev_P is None or not refresh_happened:
+        expected_m_before = np.asarray(init.get("m", state_before["m"]), dtype=dtype).copy()
+        expected_v_before = np.asarray(init.get("v", state_before["v"]), dtype=dtype).copy()
+        if expected_m_before.shape != state_before["m"].shape:
+            expected_m_before = _pad_or_trim(expected_m_before, state_before["m"].shape[0])
+        if expected_v_before.shape != state_before["v"].shape:
+            expected_v_before = _pad_or_trim(expected_v_before, state_before["v"].shape[0])
+    elif spec["first_moment_mode"] == "reset_on_refresh":
+        expected_m_before = np.zeros_like(state_before["m"])
+        expected_v_before = np.zeros_like(state_before["v"])
+    elif spec["first_moment_mode"] == "carry_unchanged":
+        expected_m_before = _pad_or_trim(_as_dtype(init.get("m", state_before["m"]), dtype), state_before["m"].shape[0])
+        expected_v_before = _pad_or_trim(_as_dtype(init.get("v", state_before["v"]), dtype), state_before["v"].shape[0])
+    elif spec["first_moment_mode"] == "basis_overlap_transport":
+        old_m = _pad_or_trim(_as_dtype(init.get("m", state_before["m"]), dtype), overlap.shape[1])
+        old_v = _pad_or_trim(_as_dtype(init.get("v", state_before["v"]), dtype), overlap.shape[1])
+        expected_m_before = overlap @ old_m
+        expected_v_before = (overlap * overlap) @ old_v
+    else:
+        raise ValueError(f"unsupported first_moment_mode={spec['first_moment_mode']}")
+    first_moment_transport_error = float(np.linalg.norm(state_before["m"] - expected_m_before))
+    second_moment_transport_error = float(np.linalg.norm(state_before["v"] - expected_v_before))
 
-    if MODE_SPECS[mode]["residual_mode"] == "current_projection_compensated":
+    if spec["residual_mode"] == "current_projection_compensated":
         A = g + state_before["e"]
     else:
         A = g.copy()
@@ -234,7 +269,7 @@ def run_single_step(
     phi_raw = float(np.linalg.norm(psi) / (np.linalg.norm(R) + float(cfg.eps_scale)))
     s_t = _clip_scale(phi_raw, cfg)
 
-    if MODE_SPECS[mode]["residual_mode"] == "current_projection_compensated":
+    if spec["residual_mode"] == "current_projection_compensated":
         rho_t = float(np.clip(float(cfg.rho), float(cfg.rho_min), float(cfg.rho_max)))
         Z = rho_t * Q
         tau = 1.0
@@ -277,11 +312,18 @@ def run_single_step(
         "refresh_happened": bool(refresh_happened),
         "reset_event": bool(reset_event),
         "basis_overlap": _basis_overlap(P, prev_P),
+        "first_moment_mode": spec["first_moment_mode"],
+        "second_moment_mode": spec["second_moment_mode"],
         "g": g,
         "A": A,
         "R": R,
         "Q": Q,
         "P": P,
+        "overlap_matrix": None if overlap is None else overlap,
+        "expected_m_before": expected_m_before,
+        "expected_v_before": expected_v_before,
+        "first_moment_transport_error": float(first_moment_transport_error),
+        "second_moment_transport_error": float(second_moment_transport_error),
         "reconstructed": reconstructed,
         "m": m,
         "v": v,
@@ -351,6 +393,7 @@ def run_trace(
     rng_seed: int = 0,
     scheduler_factory_id: str | None = None,
     parent_task_id: str = "P0-MOVING-PROJECTION-STATE-002",
+    parent_pr: str | None = None,
 ) -> dict[str, Any]:
     scheduler_factory_id = scheduler_factory_id or str(uuid.uuid4())
     scheduler = StaticSchedule(bases, scheduler_factory_id=scheduler_factory_id)
@@ -362,6 +405,8 @@ def run_trace(
     basis_overlap = []
     max_decomp = 0.0
     max_residual = 0.0
+    max_first_moment_transport_error = 0.0
+    max_second_moment_transport_error = 0.0
     used_noise = []
     for step_index, g in enumerate(gradients):
         noise = np.zeros_like(g, dtype=dtype)
@@ -385,6 +430,14 @@ def run_trace(
             basis_overlap.append(float(result["basis_overlap"]))
         max_decomp = max(max_decomp, float(result["decomposition_error"]))
         max_residual = max(max_residual, float(result["residual_error"]))
+        max_first_moment_transport_error = max(
+            max_first_moment_transport_error,
+            float(result["first_moment_transport_error"]),
+        )
+        max_second_moment_transport_error = max(
+            max_second_moment_transport_error,
+            float(result["second_moment_transport_error"]),
+        )
         state = result["state_after_step"]
         prev_P = P
     noise_hash = None
@@ -394,6 +447,8 @@ def run_trace(
         "mode": mode,
         "projection_mode": MODE_SPECS[mode]["projection_mode"],
         "state_transport_mode": MODE_SPECS[mode]["state_transport_mode"],
+        "first_moment_mode": MODE_SPECS[mode]["first_moment_mode"],
+        "second_moment_mode": MODE_SPECS[mode]["second_moment_mode"],
         "residual_mode": MODE_SPECS[mode]["residual_mode"],
         "reset_events": reset_events,
         "basis_overlap": basis_overlap,
@@ -402,6 +457,7 @@ def run_trace(
         "scheduler_factory_id": str(scheduler_factory_id),
         "scheduler_object_id": scheduler.scheduler_object_id,
         "code_commit": _git_commit(),
+        "parent_pr": parent_pr,
         "parent_task_id": parent_task_id,
     }
     return {
@@ -411,6 +467,8 @@ def run_trace(
         "noise_bank": np.asarray(used_noise, dtype=dtype),
         "max_decomposition_error": float(max_decomp),
         "max_residual_error": float(max_residual),
+        "max_first_moment_transport_error": float(max_first_moment_transport_error),
+        "max_second_moment_transport_error": float(max_second_moment_transport_error),
     }
 
 
@@ -423,6 +481,7 @@ def run_method_suite(
     stochastic_noise_std: float | None = None,
     rng_seed: int = 0,
     parent_task_id: str = "P0-MOVING-PROJECTION-STATE-002",
+    parent_pr: str | None = None,
 ) -> dict[str, Any]:
     dtype = np.dtype(cfg.dtype)
     noise_bank = None
@@ -441,5 +500,6 @@ def run_method_suite(
             rng_seed=rng_seed,
             scheduler_factory_id=f"{mode}-{uuid.uuid4()}",
             parent_task_id=parent_task_id,
+            parent_pr=parent_pr,
         )
     return suite

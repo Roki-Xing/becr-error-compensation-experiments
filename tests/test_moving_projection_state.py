@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import subprocess
 
 import numpy as np
 
@@ -190,3 +191,123 @@ def test_fp64_trace_invariants():
     )
     assert trace["max_decomposition_error"] <= 1e-10
     assert trace["max_residual_error"] <= 1e-10
+
+
+def test_first_moment_transport_formula_exact():
+    cfg = MovingProjectionConfig(dtype=np.float64)
+
+    P_old = make_basis(2, [0], dtype=np.float64)
+    P_new = make_basis(2, [1], dtype=np.float64)
+    result = run_single_step(
+        mode="projection_aware_transport",
+        cfg=cfg,
+        g=np.zeros((2,), dtype=np.float64),
+        P=P_new,
+        prev_P=P_old,
+        initial_state={
+            "m": np.asarray([3.5], dtype=np.float64),
+            "v": np.asarray([2.0], dtype=np.float64),
+            "t": 4,
+            "e": np.zeros((2,), dtype=np.float64),
+        },
+        step_index=0,
+    )
+    assert np.linalg.norm(np.asarray(result["state_before_step"]["m"], dtype=np.float64)) <= 1e-10
+
+    P_old = make_basis(2, [0], dtype=np.float64)
+    P_new = np.asarray([[1.0], [1.0]], dtype=np.float64) / np.sqrt(2.0)
+    m_old = np.asarray([2.25], dtype=np.float64)
+    expected = P_new.T @ P_old @ m_old
+    result = run_single_step(
+        mode="projection_aware_transport",
+        cfg=cfg,
+        g=np.zeros((2,), dtype=np.float64),
+        P=P_new,
+        prev_P=P_old,
+        initial_state={
+            "m": m_old,
+            "v": np.asarray([1.0], dtype=np.float64),
+            "t": 2,
+            "e": np.zeros((2,), dtype=np.float64),
+        },
+        step_index=0,
+    )
+    transported = np.asarray(result["state_before_step"]["m"], dtype=np.float64)
+    assert np.linalg.norm(transported - expected) <= 1e-10
+
+
+def test_second_moment_transport_mode_explicit():
+    bases = [make_basis(2, [0], dtype=np.float64), make_basis(2, [1], dtype=np.float64)]
+    grads = [np.ones((2,), dtype=np.float64) for _ in range(2)]
+    suite = run_method_suite(
+        modes=["state_reset_explicit", "official_fira_carry", "projection_aware_transport", "full_residual_current_projection"],
+        cfg=MovingProjectionConfig(dtype=np.float64),
+        gradients=grads,
+        bases=bases,
+        parent_pr="#2",
+    )
+    assert suite["state_reset_explicit"]["manifest"]["second_moment_mode"] == "reset_on_refresh"
+    assert suite["official_fira_carry"]["manifest"]["second_moment_mode"] == "carry_unchanged"
+    assert suite["projection_aware_transport"]["manifest"]["second_moment_mode"] == "squared_basis_overlap_transport"
+    assert suite["full_residual_current_projection"]["manifest"]["second_moment_mode"] == "squared_basis_overlap_transport"
+
+
+def test_second_moment_transport_formula_exact():
+    cfg = MovingProjectionConfig(dtype=np.float64)
+    P_old = make_basis(2, [0], dtype=np.float64)
+    P_new = np.asarray([[1.0], [1.0]], dtype=np.float64) / np.sqrt(2.0)
+    v_old = np.asarray([5.0], dtype=np.float64)
+    overlap = P_new.T @ P_old
+    expected = (overlap * overlap) @ v_old
+    result = run_single_step(
+        mode="projection_aware_transport",
+        cfg=cfg,
+        g=np.zeros((2,), dtype=np.float64),
+        P=P_new,
+        prev_P=P_old,
+        initial_state={
+            "m": np.asarray([1.0], dtype=np.float64),
+            "v": v_old,
+            "t": 3,
+            "e": np.zeros((2,), dtype=np.float64),
+        },
+        step_index=0,
+    )
+    transported = np.asarray(result["state_before_step"]["v"], dtype=np.float64)
+    assert np.linalg.norm(transported - expected) <= 1e-10
+
+
+def test_manifest_contains_parent_pr_and_second_moment_mode(tmp_path: Path):
+    artifact_dir = generate_artifacts(output_root=tmp_path, parent_task_id="P0-MOVING-PROJECTION-STATE-002", parent_pr="#2")
+    manifest = json.loads((artifact_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["parent_pr"] == "#2"
+    assert manifest["second_moment_mode"] == "squared_basis_overlap_transport"
+
+
+def test_sample_trace_is_strict_json():
+    path = Path("experiments/tier1-synthetic/moving_projection_artifacts/20260627T000000Z_p0_moving_projection_state/sample_trace.json")
+    text = path.read_text(encoding="utf-8")
+    json.loads(text, parse_constant=lambda token: (_ for _ in ()).throw(ValueError(token)))
+    assert "NaN" not in text
+    assert "Infinity" not in text
+
+
+def test_generated_manifest_commit_matches_head(tmp_path: Path):
+    artifact_dir = generate_artifacts(output_root=tmp_path, parent_task_id="P0-MOVING-PROJECTION-STATE-002", parent_pr="#2")
+    manifest = json.loads((artifact_dir / "manifest.json").read_text(encoding="utf-8"))
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    assert manifest["code_commit"] == head
+
+
+def test_all_pr1_gates_present_after_rebase():
+    required = [
+        Path("fira_parity"),
+        Path("third_party/fira_oracle"),
+        Path("tests/test_fira_parity.py"),
+        Path("tests/test_labeling.py"),
+        Path("docs/FIRA_PARITY_SPEC.md"),
+        Path("docs/FIRA_LABEL_AUDIT.md"),
+        Path(".github/workflows/fira-parity.yml"),
+    ]
+    missing = [str(path) for path in required if not path.exists()]
+    assert not missing, f"missing PR #1 gates: {missing}"

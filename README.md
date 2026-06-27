@@ -70,7 +70,9 @@ These artifacts are separate from the older tier1/neural result aggregates and
 should be used when auditing moving-projection state transport, residual
 decomposition, scheduler isolation, and CRN provenance. See
 `docs/MOVING_PROJECTION_STATE_AUDIT.md` for the legacy-confound audit that
-motivated this harness.
+motivated this harness. The committed files under
+`experiments/tier1-synthetic/moving_projection_artifacts/` are review
+snapshots; CI regeneration is the executable provenance check.
 
 ## Data
 

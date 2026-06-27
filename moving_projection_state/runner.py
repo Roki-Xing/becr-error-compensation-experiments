@@ -14,8 +14,13 @@ from .core import MovingProjectionConfig, make_basis, run_method_suite
 
 
 def _serialize(obj):
+    if isinstance(obj, (float, np.floating)):
+        val = float(obj)
+        if not np.isfinite(val):
+            return None
+        return val
     if isinstance(obj, np.ndarray):
-        return obj.tolist()
+        return _serialize(obj.tolist())
     if isinstance(obj, dict):
         return {k: _serialize(v) for k, v in obj.items()}
     if isinstance(obj, list):
@@ -24,10 +29,10 @@ def _serialize(obj):
 
 
 def _write_json(path: Path, obj) -> None:
-    path.write_text(json.dumps(_serialize(obj), indent=2), encoding="utf-8")
+    path.write_text(json.dumps(_serialize(obj), indent=2, allow_nan=False), encoding="utf-8")
 
 
-def _build_demo_suite(parent_task_id: str) -> dict[str, dict]:
+def _build_demo_suite(parent_task_id: str, parent_pr: str | None) -> dict[str, dict]:
     bases = [
         make_basis(2, [0], dtype=np.float64),
         make_basis(2, [0], dtype=np.float64),
@@ -59,6 +64,7 @@ def _build_demo_suite(parent_task_id: str) -> dict[str, dict]:
         stochastic_noise_std=0.15,
         rng_seed=11,
         parent_task_id=parent_task_id,
+        parent_pr=parent_pr,
     )
 
 
@@ -93,6 +99,7 @@ def generate_artifacts(
     *,
     output_root: Path,
     parent_task_id: str = "P0-MOVING-PROJECTION-STATE-002",
+    parent_pr: str | None = None,
     run_id: str | None = None,
 ) -> Path:
     output_root = Path(output_root)
@@ -101,7 +108,7 @@ def generate_artifacts(
     out_dir = output_root / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    suite = _build_demo_suite(parent_task_id=parent_task_id)
+    suite = _build_demo_suite(parent_task_id=parent_task_id, parent_pr=parent_pr)
     sample = suite["full_residual_current_projection"]
 
     _write_json(out_dir / "manifest.json", sample["manifest"])
