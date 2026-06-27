@@ -43,6 +43,7 @@ docs/
 
 ```bash
 python experiments/tier1-synthetic/run_synth_tier1_suite.py
+python experiments/tier1-synthetic/run_moving_projection_state_suite.py
 python experiments/tier1-synthetic/plot_tier1_paper_fig2.py
 python experiments/cifar10-small-cnn/run_cifar10_coordproj_mechanism.py --seeds 0 1 2
 python experiments/mnist-mlp/run_mnist_mlp_coordproj_mechanism.py --seeds 0 1 2
@@ -53,6 +54,23 @@ sanity check and the residual transmission ablations:
 
 - `rho_no_lower_bound`: `rho_t = min(phi_raw, rho_max)`
 - `coupled_unbounded`: `rho_t = phi_raw`
+
+## Moving-Projection State Harness
+
+`experiments/tier1-synthetic/run_moving_projection_state_suite.py` is the
+P0 moving-projection correctness harness. It generates small deterministic
+and CRN-controlled traces for the explicit modes:
+
+- `state_reset_explicit`
+- `official_fira_carry`
+- `projection_aware_transport`
+- `full_residual_current_projection`
+
+These artifacts are separate from the older tier1/neural result aggregates and
+should be used when auditing moving-projection state transport, residual
+decomposition, scheduler isolation, and CRN provenance. See
+`docs/MOVING_PROJECTION_STATE_AUDIT.md` for the legacy-confound audit that
+motivated this harness.
 
 ## Data
 
