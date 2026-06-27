@@ -6,7 +6,9 @@
       "step_index": 0,
       "refresh_happened": true,
       "reset_event": false,
-      "basis_overlap": NaN,
+      "basis_overlap": null,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         2.0051289150879774,
         1.2039621310464943
@@ -30,6 +32,15 @@
           0.0
         ]
       ],
+      "overlap_matrix": null,
+      "expected_m_before": [
+        0.0
+      ],
+      "expected_v_before": [
+        0.0
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         2.0051289150879774,
         0.0
@@ -110,6 +121,8 @@
       "refresh_happened": false,
       "reset_event": false,
       "basis_overlap": 1.0,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         1.68370816178789,
         1.02345393848185
@@ -133,6 +146,19 @@
           0.0
         ]
       ],
+      "overlap_matrix": [
+        [
+          1.0
+        ]
+      ],
+      "expected_m_before": [
+        0.2005128915087977
+      ],
+      "expected_v_before": [
+        0.004020541966121893
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         1.68370816178789,
         0.0
@@ -213,6 +239,8 @@
       "refresh_happened": true,
       "reset_event": false,
       "basis_overlap": 0.0,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         0.955304573334033,
         -2.079107628955014
@@ -236,6 +264,19 @@
           1.0
         ]
       ],
+      "overlap_matrix": [
+        [
+          0.0
+        ]
+      ],
+      "expected_m_before": [
+        0.0
+      ],
+      "expected_v_before": [
+        0.0
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         0.0,
         -1.0908160673241811
@@ -316,6 +357,8 @@
       "refresh_happened": false,
       "reset_event": false,
       "basis_overlap": 1.0,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         0.8854589536357941,
         -1.5084096658568427
@@ -339,6 +382,19 @@
           1.0
         ]
       ],
+      "overlap_matrix": [
+        [
+          1.0
+        ]
+      ],
+      "expected_m_before": [
+        -0.10908160673241808
+      ],
+      "expected_v_before": [
+        0.0011898796927325935
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         0.0,
         -1.5084096658568427
@@ -419,6 +475,8 @@
       "refresh_happened": true,
       "reset_event": false,
       "basis_overlap": 0.0,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         -0.48796715756151837,
         0.9229012801538836
@@ -442,6 +500,19 @@
           0.0
         ]
       ],
+      "overlap_matrix": [
+        [
+          0.0
+        ]
+      ],
+      "expected_m_before": [
+        0.0
+      ],
+      "expected_v_before": [
+        0.0
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         0.19679142056926296,
         0.0
@@ -522,6 +593,8 @@
       "refresh_happened": false,
       "reset_event": false,
       "basis_overlap": 1.0,
+      "first_moment_mode": "basis_overlap_transport",
+      "second_moment_mode": "squared_basis_overlap_transport",
       "g": [
         -0.16501768379507195,
         0.785535175976657
@@ -545,6 +618,19 @@
           0.0
         ]
       ],
+      "overlap_matrix": [
+        [
+          1.0
+        ]
+      ],
+      "expected_m_before": [
+        0.019679142056926294
+      ],
+      "expected_v_before": [
+        3.872686320966857e-05
+      ],
+      "first_moment_transport_error": 0.0,
+      "second_moment_transport_error": 0.0,
       "reconstructed": [
         -0.16501768379507195,
         0.0
@@ -624,6 +710,8 @@
     "mode": "full_residual_current_projection",
     "projection_mode": "provided_schedule",
     "state_transport_mode": "basis_overlap_transport",
+    "first_moment_mode": "basis_overlap_transport",
+    "second_moment_mode": "squared_basis_overlap_transport",
     "residual_mode": "current_projection_compensated",
     "reset_events": [],
     "basis_overlap": [
@@ -635,9 +723,10 @@
     ],
     "rng_seed": 11,
     "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
-    "scheduler_factory_id": "full_residual_current_projection-9375b998-7b70-4f58-8f44-9d3010ff27d4",
-    "scheduler_object_id": "3566fba9-7f59-4aa1-a31e-1f73e00aef2d",
-    "code_commit": "09c023f5926ddfa47166ddb45d276e814567304c",
+    "scheduler_factory_id": "full_residual_current_projection-9398d20c-a3a3-4196-8893-d33ca0625d9d",
+    "scheduler_object_id": "6cc83133-f417-4b58-b527-4155f71bae3f",
+    "code_commit": "c828a55394db4a7d76d516894abac6009684c41f",
+    "parent_pr": "#2",
     "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
   },
   "noise_bank": [
@@ -667,5 +756,7 @@
     ]
   ],
   "max_decomposition_error": 0.0,
-  "max_residual_error": 0.0
+  "max_residual_error": 0.0,
+  "max_first_moment_transport_error": 0.0,
+  "max_second_moment_transport_error": 0.0
 }
