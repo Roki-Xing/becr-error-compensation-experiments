@@ -74,14 +74,29 @@ motivated this harness. The committed files under
 `experiments/tier1-synthetic/moving_projection_artifacts/` are review
 snapshots; CI regeneration is the executable provenance check.
 
+## Corrected Provenance / CRN Infrastructure
+
+`experiments/tier1-synthetic/run_provenance_smoke.py` is the corrected
+stochastic smoke runner introduced for `P0-CRN-MANIFEST-003`. It provides:
+
+- immutable run IDs
+- strict JSON manifests
+- explicit run-ID aggregation
+- common random numbers (CRN)
+- scheduler factory isolation
+- old-result quarantine for corrected aggregates
+
+See `docs/PROVENANCE_AND_CRN_SPEC.md` for the corrected provenance policy.
+
 ## Data
 
 Datasets are intentionally excluded from Git. The neural scripts download or
 prepare their required datasets under their local `data/` directories.
 
-For neural diagnostics, `results/ALL_RUNS.json` is the authoritative aggregate.
-Individual run JSON copies are intentionally omitted from this snapshot to avoid
-mixing earlier and corrected reruns.
+Legacy neural `results/ALL_RUNS.json` files remain diagnostic-only repository
+artifacts. They are not the source of truth for corrected stochastic synthetic
+claims, and the new provenance pipeline does not read them when building
+corrected aggregates.
 
 ## Environment
 

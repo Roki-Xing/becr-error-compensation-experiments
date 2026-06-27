@@ -20,3 +20,5 @@ jobs:
         run: python -m pytest -q
       - name: Smoke-check moving projection artifacts
         run: python -m moving_projection_state.artifact_check --artifact-dir experiments/tier1-synthetic/moving_projection_artifacts/20260627T000000Z_p0_moving_projection_state --smoke-generate
+      - name: Smoke-generate provenance artifacts
+        run: python experiments/tier1-synthetic/run_provenance_smoke.py --output-root /tmp/becr_provenance_smoke --run-id ci_smoke --paper-quality
