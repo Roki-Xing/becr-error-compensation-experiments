@@ -1,0 +1,23 @@
+{
+  "mode": "full_residual_current_projection",
+  "projection_mode": "provided_schedule",
+  "state_transport_mode": "basis_overlap_transport",
+  "first_moment_mode": "basis_overlap_transport",
+  "second_moment_mode": "squared_basis_overlap_transport",
+  "residual_mode": "current_projection_compensated",
+  "reset_events": [],
+  "basis_overlap": [
+    1.0,
+    0.0,
+    1.0,
+    0.0,
+    1.0
+  ],
+  "rng_seed": 11,
+  "noise_hash": "a3e73e02f2bf1fd55dbb92f1ebd4fed728cd79175f7c0aa2377a161a1340764b",
+  "scheduler_factory_id": "full_residual_current_projection-9398d20c-a3a3-4196-8893-d33ca0625d9d",
+  "scheduler_object_id": "6cc83133-f417-4b58-b527-4155f71bae3f",
+  "code_commit": "c828a55394db4a7d76d516894abac6009684c41f",
+  "parent_pr": "#2",
+  "parent_task_id": "P0-MOVING-PROJECTION-STATE-002"
+}
