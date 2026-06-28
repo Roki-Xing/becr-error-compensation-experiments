@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 import math
+import shutil
 import time
 from pathlib import Path
 from typing import Any
@@ -51,6 +53,10 @@ DEFAULT_COORD_METHODS = [
     "rho_no_lower_bound",
     "coupled_unbounded",
 ]
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
 STATE_MODES = [
     "state_reset_explicit",
     "official_fira_carry",
@@ -305,6 +311,255 @@ def _aggregate_metrics(metric_rows: list[dict[str, Any]], methods: list[str], la
     return summary
 
 
+def _command_for_run(*, output_root: Path, run_id: str, experiment_name: str | None = None, tiny: bool, paper_quality: bool, parent_pr: str | None) -> str:
+    parts = [
+        "python",
+        "experiments/tier1-synthetic/run_corrected_synthetic_suite.py",
+        "--output-root",
+        str(output_root),
+        "--run-id",
+        run_id,
+    ]
+    if paper_quality:
+        parts.append("--paper-quality")
+    if tiny:
+        parts.append("--tiny")
+    if parent_pr is not None:
+        parts.extend(["--parent-pr", parent_pr])
+    if experiment_name is not None:
+        parts.extend(["--experiments", experiment_name])
+    return " ".join(parts)
+
+
+def _claim_summary_for_theorem(summary: dict[str, Any]) -> dict[str, Any]:
+    raw = summary["methods"]["fira_raw"]
+    clipped = summary["methods"]["fira_clipped"]
+    becr = summary["methods"]["becr"]
+    no_lower = summary["methods"]["rho_no_lower_bound"]
+    coupled = summary["methods"]["coupled_unbounded"]
+    return {
+        "raw_nonzero_stationary": bool(raw["grad_norm_final"] > 1e-2 and abs(raw["final_y"]) > 1e-2),
+        "raw_cumulative_phi_finite": bool(raw["phi_raw_cum_final"] < 10.0),
+        "clipped_repairs_relative_to_raw": bool(clipped["grad_norm_final"] < raw["grad_norm_final"] * 1e-2),
+        "becr_repairs_relative_to_raw": bool(becr["grad_norm_final"] < raw["grad_norm_final"] * 1e-2),
+        "becr_residual_small": bool((becr["residual_norm_final"] or 0.0) < 1e-2),
+        "no_lower_worse_than_becr": bool(no_lower["grad_norm_final"] > becr["grad_norm_final"] * 100.0),
+        "coupled_worse_than_becr": bool(coupled["grad_norm_final"] > becr["grad_norm_final"] * 100.0),
+        "statement": "Raw Fira-style recovery leaves a nonzero orthogonal gradient; clipped recovery and BECR repair it, while residual without bounded transmission remains worse than BECR.",
+    }
+
+
+def _claim_summary_for_high_dimensional(summary: dict[str, Any]) -> dict[str, Any]:
+    raw = summary["methods"]["fira_raw"]
+    clipped = summary["methods"]["fira_clipped"]
+    becr = summary["methods"]["becr"]
+    return {
+        "raw_orthogonal_gradient_mean": raw["grad_perp_norm_mean"],
+        "clipped_orthogonal_gradient_mean": clipped["grad_perp_norm_mean"],
+        "becr_orthogonal_gradient_mean": becr["grad_perp_norm_mean"],
+        "clipped_reduces_orthogonal_stale_channel": bool(clipped["grad_perp_norm_mean"] < raw["grad_perp_norm_mean"] * 1e-3),
+        "becr_reduces_orthogonal_stale_channel": bool(becr["grad_perp_norm_mean"] < raw["grad_perp_norm_mean"] * 1e-3),
+        "full_stationarity_claim_supported": False,
+        "statement": "In the corrected fixed-stale synthetic, clipping and BECR fix the orthogonal stale channel relative to raw recovery. The projected branch can still leave nonzero parallel gradient, so this summary does not claim universal full stationarity.",
+    }
+
+
+def _claim_summary_for_anisotropic(summary: dict[str, Any]) -> dict[str, Any]:
+    methods = summary["methods"]
+    becr = methods["becr"]["grad_norm_mean"]
+    clipped = methods["fira_clipped"]["grad_norm_mean"]
+    raw = methods["fira_raw"]["grad_norm_mean"]
+    proj = methods["proj_baseline"]["grad_norm_mean"]
+    becr_beats_clipped = bool(becr < clipped)
+    becr_beats_raw = bool(becr < raw)
+    becr_beats_proj = bool(becr < proj)
+    if becr_beats_proj:
+        statement = "In this anisotropic synthetic setting, BECR improves over clipped/raw and also beats the projected baseline on mean final gradient norm."
+    else:
+        statement = "In this anisotropic synthetic setting, BECR improves over clipped/raw under paired noisy projection, but does not beat the projected baseline on mean final gradient norm."
+    return {
+        "becr_beats_clipped_on_grad_norm_mean": becr_beats_clipped,
+        "becr_beats_raw_on_grad_norm_mean": becr_beats_raw,
+        "becr_beats_projected_baseline_on_grad_norm_mean": becr_beats_proj,
+        "statement": statement,
+    }
+
+
+def _write_memory_runtime_summary(*, group_dir: Path, manifest_paths: list[Path], memory_paths: list[Path]) -> Path:
+    rows = []
+    for manifest_path, memory_path in zip(manifest_paths, memory_paths, strict=False):
+        manifest = _read_json(manifest_path)
+        memory = _read_json(memory_path)
+        rows.append(
+            {
+                "run_id": manifest["run_id"],
+                "experiment_name": manifest["config"]["experiment_name"],
+                "method": manifest["method"],
+                "memory_path": str(memory_path),
+                "parameter_bytes": memory["parameter_bytes"],
+                "first_moment_bytes": memory["first_moment_bytes"],
+                "second_moment_bytes": memory["second_moment_bytes"],
+                "projection_bytes": memory["projection_bytes"],
+                "residual_bytes": memory["residual_bytes"],
+                "optimizer_step_time_ms": memory["optimizer_step_time_ms"],
+                "wall_clock_time_ms": memory["wall_clock_time_ms"],
+            }
+        )
+    by_experiment: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        exp = row["experiment_name"]
+        bucket = by_experiment.setdefault(exp, {"count": 0, "representative_files": [], "residual_bytes": [], "projection_bytes": []})
+        bucket["count"] += 1
+        if len(bucket["representative_files"]) < 4:
+            bucket["representative_files"].append(row["memory_path"])
+        if row["residual_bytes"] is not None:
+            bucket["residual_bytes"].append(row["residual_bytes"])
+        if row["projection_bytes"] is not None:
+            bucket["projection_bytes"].append(row["projection_bytes"])
+    out = group_dir / "memory_runtime_summary.json"
+    write_json_strict(
+        out,
+        {
+            "run_id": group_dir.name,
+            "row_count": len(rows),
+            "experiments": by_experiment,
+            "representative_rows": rows[:12],
+        },
+        sort_keys=True,
+    )
+    return out
+
+
+def _write_scale_log_summary(*, group_dir: Path, manifest_paths: list[Path], scale_log_paths: list[Path]) -> Path:
+    rows = []
+    for manifest_path, scale_log_path in zip(manifest_paths, scale_log_paths, strict=False):
+        manifest = _read_json(manifest_path)
+        rows.append(
+            {
+                "run_id": manifest["run_id"],
+                "experiment_name": manifest["config"]["experiment_name"],
+                "method": manifest["method"],
+                "scale_log_path": str(scale_log_path),
+                "scale_logging_schema": manifest["scale_logging_schema"],
+            }
+        )
+    by_experiment: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        exp = row["experiment_name"]
+        bucket = by_experiment.setdefault(exp, {"count": 0, "representative_scale_logs": [], "methods": []})
+        bucket["count"] += 1
+        if len(bucket["representative_scale_logs"]) < 6:
+            bucket["representative_scale_logs"].append(row["scale_log_path"])
+        if row["method"] not in bucket["methods"]:
+            bucket["methods"].append(row["method"])
+    out = group_dir / "scale_log_summary.json"
+    write_json_strict(
+        out,
+        {
+            "run_id": group_dir.name,
+            "row_count": len(rows),
+            "experiments": by_experiment,
+            "representative_rows": rows[:12],
+        },
+        sort_keys=True,
+    )
+    return out
+
+
+def _write_artifact_index(
+    *,
+    group_dir: Path,
+    output_root: Path,
+    metadata: dict[str, Any],
+    run_id: str,
+    paper_quality: bool,
+    tiny: bool,
+    parent_pr: str | None,
+    command: str,
+    results: dict[str, Any],
+    memory_runtime_summary_path: Path,
+    scale_log_summary_path: Path,
+) -> Path:
+    artifact_index = {
+        "run_id": run_id,
+        "code_commit": metadata["code_commit"],
+        "dirty": bool(metadata["dirty"]),
+        "branch": metadata["branch"],
+        "command": command,
+        "paper_quality": paper_quality,
+        "tiny": tiny,
+        "parent_pr": parent_pr,
+        "output_root": str(output_root),
+        "group_dir": str(group_dir),
+        "aggregate_manifest_paths": [str(path) for path in results["aggregate_manifest_paths"]],
+        "aggregate_summary_paths": [str(path) for path in results["aggregate_summary_paths"]],
+        "experiment_summary_paths": [str(path) for path in results["experiment_summary_paths"]],
+        "figure_paths": [str(path) for path in results["figure_paths"]],
+        "figure_metadata_paths": [str(path) for path in results["plot_metadata_paths"]],
+        "table_paths": [str(path) for path in results["table_paths"]],
+        "memory_paths": [str(path) for path in results["memory_paths"]],
+        "scale_log_paths": [str(path) for path in results["scale_log_paths"]],
+        "memory_runtime_summary_path": str(memory_runtime_summary_path),
+        "scale_log_summary_path": str(scale_log_summary_path),
+        "run_manifest_index_path": str(group_dir / "run_manifest_index.json"),
+        "exact_fira_fixture_summary_path": str(results["exact_fira_summary_path"]),
+        "ldadam_status_path": str(results["ldadam_status_path"]),
+        "old_results_used": False,
+        "legacy_results_used": False,
+    }
+    out = group_dir / "artifact_index.json"
+    write_json_strict(out, artifact_index, sort_keys=True)
+    return out
+
+
+def _write_review_snapshot(*, group_dir: Path, artifact_index_path: Path, review_snapshot_dir: Path) -> Path:
+    artifact_index = _read_json(artifact_index_path)
+    if review_snapshot_dir.exists():
+        shutil.rmtree(review_snapshot_dir)
+    review_snapshot_dir.mkdir(parents=True, exist_ok=False)
+    keep = [
+        Path(artifact_index_path),
+        Path(artifact_index["run_manifest_index_path"]),
+        Path(artifact_index["exact_fira_fixture_summary_path"]),
+        Path(artifact_index["ldadam_status_path"]),
+        Path(artifact_index["memory_runtime_summary_path"]),
+        Path(artifact_index["scale_log_summary_path"]),
+    ]
+    for key in (
+        "aggregate_manifest_paths",
+        "aggregate_summary_paths",
+        "experiment_summary_paths",
+        "figure_paths",
+        "figure_metadata_paths",
+        "table_paths",
+    ):
+        keep.extend(Path(path) for path in artifact_index[key])
+    for source in keep:
+        rel = source.relative_to(group_dir)
+        dest = review_snapshot_dir / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, dest)
+    readme = review_snapshot_dir / "README.md"
+    readme.write_text(
+        "\n".join(
+            [
+                "# Corrected Synthetic Review Snapshot",
+                "",
+                "- This directory is a reviewer-convenience snapshot, not the sole source of truth.",
+                f"- Semantic source commit: `{artifact_index['code_commit']}`.",
+                "- Source of truth remains reproducible generation from current code plus strict JSON validation and CI regeneration.",
+                "- Regenerate the full local paper-quality suite with:",
+                f"  `{artifact_index['command']}`",
+                "- CI generates a tiny paper-quality corrected synthetic artifact separately for reproducibility checks.",
+                "- No paper claim should rely on stale or unchecked artifacts alone.",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return review_snapshot_dir
+
+
 def _config_dict(experiment_name: str, extra: dict[str, Any]) -> dict[str, Any]:
     out = {"experiment_name": experiment_name}
     out.update(extra)
@@ -314,6 +569,7 @@ def _config_dict(experiment_name: str, extra: dict[str, Any]) -> dict[str, Any]:
 def _run_theorem_regime(
     *,
     group_dir: Path,
+    output_root: Path,
     metadata: dict[str, Any],
     tiny: bool,
     paper_quality: bool,
@@ -353,6 +609,7 @@ def _run_theorem_regime(
         },
     )
     cfg_hash = config_hash(config)
+    run_command = _command_for_run(output_root=output_root, run_id=group_dir.name, experiment_name=experiment_name, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     method_payloads: dict[str, dict[str, Any]] = {}
     metric_rows = []
     manifest_paths = []
@@ -413,7 +670,7 @@ def _run_theorem_regime(
             state_transport_mode="not_applicable",
             residual_mode=residual_mode,
             second_moment_mode="not_applicable",
-            command=f"python experiments/tier1-synthetic/run_corrected_synthetic_suite.py --output-root {group_dir.parent} --run-id {group_dir.name} --experiments theorem_regime",
+            command=run_command,
             parent_pr=parent_pr,
             outputs=outputs,
         )
@@ -447,8 +704,10 @@ def _run_theorem_regime(
         "source_manifest_paths": aggregate_manifest["source_manifest_paths"],
         "theorem_conditions": theorem,
         "methods": {row["method"]: row for row in metric_rows},
+        "claim_summary": {},
         "paper_quality": paper_quality,
     }
+    summary["claim_summary"] = _claim_summary_for_theorem(summary)
     summary_path = exp_dir / "aggregates" / aggregate_id / "theorem_summary.json"
     write_json_strict(summary_path, summary, sort_keys=True)
     table_path = exp_dir / "tables" / "theorem_stationarity_table.md"
@@ -470,6 +729,7 @@ def _run_theorem_regime(
         "memory_paths": memory_paths,
         "scale_log_paths": scale_log_paths,
         "aggregate_manifest_path": aggregate_info["aggregate_manifest_path"],
+        "aggregate_summary_path": aggregate_info["summary_path"],
         "experiment_summary_path": summary_path,
         "plot_metadata_paths": [fig["metadata"]],
         "figure_paths": [fig["png"], fig["pdf"]],
@@ -481,6 +741,7 @@ def _run_theorem_regime(
 def _run_high_dimensional_fixed(
     *,
     group_dir: Path,
+    output_root: Path,
     metadata: dict[str, Any],
     tiny: bool,
     paper_quality: bool,
@@ -501,6 +762,7 @@ def _run_high_dimensional_fixed(
     scale_log_paths = []
     metric_rows = []
     label_map = {m: m for m in methods}
+    run_command = _command_for_run(output_root=output_root, run_id=group_dir.name, experiment_name=experiment_name, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     for setting in settings:
         d = int(setting["d"])
         r = int(setting["r"])
@@ -563,7 +825,7 @@ def _run_high_dimensional_fixed(
                     state_transport_mode="not_applicable",
                     residual_mode=("current_projection_compensated" if method == "becr" else ("rho_no_lower_bound" if method == "rho_no_lower_bound" else ("coupled_rho_phi_raw" if method == "coupled_unbounded" else "none"))),
                     second_moment_mode="not_applicable",
-                    command=f"python experiments/tier1-synthetic/run_corrected_synthetic_suite.py --output-root {group_dir.parent} --run-id {group_dir.name} --experiments high_dimensional_fixed",
+                    command=run_command,
                     parent_pr=parent_pr,
                     outputs=outputs,
                 )
@@ -597,9 +859,11 @@ def _run_high_dimensional_fixed(
             "settings": settings,
             "source_run_ids": aggregate_manifest["source_run_ids"],
             "source_manifest_paths": aggregate_manifest["source_manifest_paths"],
+            "claim_summary": {},
             "paper_quality": paper_quality,
         }
     )
+    summary["claim_summary"] = _claim_summary_for_high_dimensional(summary)
     summary_path = exp_dir / "aggregates" / aggregate_id / "high_dimensional_summary.json"
     write_json_strict(summary_path, summary, sort_keys=True)
     table_path = exp_dir / "tables" / "high_dimensional_stationarity_table.md"
@@ -619,6 +883,7 @@ def _run_high_dimensional_fixed(
         "memory_paths": memory_paths,
         "scale_log_paths": scale_log_paths,
         "aggregate_manifest_path": aggregate_info["aggregate_manifest_path"],
+        "aggregate_summary_path": aggregate_info["summary_path"],
         "experiment_summary_path": summary_path,
         "plot_metadata_paths": [fig["metadata"]],
         "figure_paths": [fig["png"], fig["pdf"]],
@@ -630,6 +895,7 @@ def _run_high_dimensional_fixed(
 def _run_refresh_sweep(
     *,
     group_dir: Path,
+    output_root: Path,
     metadata: dict[str, Any],
     tiny: bool,
     paper_quality: bool,
@@ -653,6 +919,7 @@ def _run_refresh_sweep(
     scale_log_paths = []
     metric_rows = []
     state_metric_rows = []
+    run_command = _command_for_run(output_root=output_root, run_id=group_dir.name, experiment_name=experiment_name, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     for K in K_list:
         tag = "inf" if K is None else str(int(K))
         config_base = _config_dict(experiment_name, {"K": tag, "d": d, "r": r, "steps": steps})
@@ -693,7 +960,7 @@ def _run_refresh_sweep(
                 state_transport_mode="not_applicable",
                 residual_mode=("current_projection_compensated" if method == "becr" else "none"),
                 second_moment_mode="not_applicable",
-                command=f"python experiments/tier1-synthetic/run_corrected_synthetic_suite.py --output-root {group_dir.parent} --run-id {group_dir.name} --experiments refresh_sweep",
+                command=run_command,
                 parent_pr=parent_pr,
                 outputs=outputs,
             )
@@ -738,7 +1005,7 @@ def _run_refresh_sweep(
                 state_transport_mode=mode if mode != "full_residual_current_projection" else "basis_overlap_transport",
                 residual_mode=("current_projection_compensated" if mode == "full_residual_current_projection" else "none"),
                 second_moment_mode=("squared_basis_overlap_transport" if mode in {"projection_aware_transport", "full_residual_current_projection"} else ("carry_unchanged" if mode == "official_fira_carry" else "reset_on_refresh")),
-                command=f"python experiments/tier1-synthetic/run_corrected_synthetic_suite.py --output-root {group_dir.parent} --run-id {group_dir.name} --experiments refresh_sweep",
+                command=run_command,
                 parent_pr=parent_pr,
                 outputs=outputs,
             )
@@ -790,6 +1057,7 @@ def _run_refresh_sweep(
         "memory_paths": memory_paths,
         "scale_log_paths": scale_log_paths,
         "aggregate_manifest_path": aggregate_info["aggregate_manifest_path"],
+        "aggregate_summary_path": aggregate_info["summary_path"],
         "experiment_summary_path": summary_path,
         "plot_metadata_paths": [fig["metadata"]],
         "figure_paths": [fig["png"], fig["pdf"]],
@@ -801,6 +1069,7 @@ def _run_refresh_sweep(
 def _run_anisotropic_noise(
     *,
     group_dir: Path,
+    output_root: Path,
     metadata: dict[str, Any],
     tiny: bool,
     paper_quality: bool,
@@ -828,6 +1097,7 @@ def _run_anisotropic_noise(
     scale_log_paths = []
     metric_rows = []
     label_map = {m: m for m in methods}
+    run_command = _command_for_run(output_root=output_root, run_id=group_dir.name, experiment_name=experiment_name, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     for seed in seeds:
         noise_bank = generate_crn_noise_bank(steps=steps, batch_size=batch_size, d=d, sigma=sigma, rng_seed=seed)
         config = _config_dict(experiment_name, {"d": d, "r": r, "steps": steps, "seed": seed, "batch_size": batch_size, "methods": methods, "schedule": "svd_batch_refresh"})
@@ -867,7 +1137,7 @@ def _run_anisotropic_noise(
                 state_transport_mode="not_applicable",
                 residual_mode=("current_projection_compensated" if method == "becr" else ("rho_no_lower_bound" if method == "rho_no_lower_bound" else ("coupled_rho_phi_raw" if method == "coupled_unbounded" else "none"))),
                 second_moment_mode="not_applicable",
-                command=f"python experiments/tier1-synthetic/run_corrected_synthetic_suite.py --output-root {group_dir.parent} --run-id {group_dir.name} --experiments anisotropic_noise",
+                command=run_command,
                 parent_pr=parent_pr,
                 outputs=outputs,
             )
@@ -883,11 +1153,21 @@ def _run_anisotropic_noise(
     by_method = summary["methods"]
     clipped_rows = [row for row in metric_rows if row["method"] == "fira_clipped"]
     becr_rows = [row for row in metric_rows if row["method"] == "becr"]
+    raw_rows = [row for row in metric_rows if row["method"] == "fira_raw"]
+    proj_rows = [row for row in metric_rows if row["method"] == "proj_baseline"]
     clipped_by_seed = {row["seed"]: row for row in clipped_rows}
     becr_by_seed = {row["seed"]: row for row in becr_rows}
-    paired = []
+    raw_by_seed = {row["seed"]: row for row in raw_rows}
+    proj_by_seed = {row["seed"]: row for row in proj_rows}
+    paired_clipped = []
+    paired_raw = []
+    paired_proj = []
     for seed in sorted(set(clipped_by_seed) & set(becr_by_seed)):
-        paired.append(becr_by_seed[seed]["grad_norm_final"] - clipped_by_seed[seed]["grad_norm_final"])
+        paired_clipped.append(becr_by_seed[seed]["grad_norm_final"] - clipped_by_seed[seed]["grad_norm_final"])
+    for seed in sorted(set(raw_by_seed) & set(becr_by_seed)):
+        paired_raw.append(becr_by_seed[seed]["grad_norm_final"] - raw_by_seed[seed]["grad_norm_final"])
+    for seed in sorted(set(proj_by_seed) & set(becr_by_seed)):
+        paired_proj.append(becr_by_seed[seed]["grad_norm_final"] - proj_by_seed[seed]["grad_norm_final"])
     summary.update(
         {
             "experiment_name": experiment_name,
@@ -895,10 +1175,16 @@ def _run_anisotropic_noise(
             "seed_count": len(seeds),
             "source_run_ids": aggregate_manifest["source_run_ids"],
             "source_manifest_paths": aggregate_manifest["source_manifest_paths"],
-            "paired_differences": {"becr_minus_clipped": paired},
+            "paired_differences": {
+                "becr_minus_clipped": paired_clipped,
+                "becr_minus_raw": paired_raw,
+                "becr_minus_proj_baseline": paired_proj,
+            },
+            "claim_summary": {},
             "paper_quality": paper_quality,
         }
     )
+    summary["claim_summary"] = _claim_summary_for_anisotropic(summary)
     summary_path = exp_dir / "aggregates" / aggregate_id / "anisotropic_noise_summary.json"
     write_json_strict(summary_path, summary, sort_keys=True)
     table_path = exp_dir / "tables" / "anisotropic_noise_table.md"
@@ -912,6 +1198,7 @@ def _run_anisotropic_noise(
         "memory_paths": memory_paths,
         "scale_log_paths": scale_log_paths,
         "aggregate_manifest_path": aggregate_info["aggregate_manifest_path"],
+        "aggregate_summary_path": aggregate_info["summary_path"],
         "experiment_summary_path": summary_path,
         "plot_metadata_paths": [fig["metadata"]],
         "figure_paths": [fig["png"], fig["pdf"]],
@@ -961,6 +1248,8 @@ def run_corrected_synthetic_suite(
     tiny: bool = False,
     method_order: list[str] | None = None,
     parent_pr: str | None = None,
+    command: str | None = None,
+    review_snapshot_dir: Path | None = None,
 ) -> dict[str, Any]:
     output_root = Path(output_root)
     group_dir = output_root / run_id
@@ -975,10 +1264,12 @@ def run_corrected_synthetic_suite(
         raise RuntimeError("paper-quality run requires a clean worktree unless allow_dirty is set")
     group_dir.mkdir(parents=True, exist_ok=False)
     selected = list(experiments or ["theorem_regime", "high_dimensional_fixed", "refresh_sweep", "anisotropic_noise"])
+    command = command or _command_for_run(output_root=output_root, run_id=run_id, experiment_name=None, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     results = {
         "group_dir": group_dir,
         "manifest_paths": [],
         "aggregate_manifest_paths": [],
+        "aggregate_summary_paths": [],
         "experiment_summary_paths": [],
         "plot_metadata_paths": [],
         "figure_paths": [],
@@ -988,35 +1279,59 @@ def run_corrected_synthetic_suite(
         "method_order_report": {},
     }
     if "theorem_regime" in selected:
-        theorem_out = _run_theorem_regime(group_dir=group_dir, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
+        theorem_out = _run_theorem_regime(group_dir=group_dir, output_root=output_root, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
         for key in ("manifest_paths", "memory_paths", "scale_log_paths", "figure_paths", "plot_metadata_paths", "table_paths"):
             results[key].extend(theorem_out[key])
         results["aggregate_manifest_paths"].append(theorem_out["aggregate_manifest_path"])
+        results["aggregate_summary_paths"].append(theorem_out["aggregate_summary_path"])
         results["experiment_summary_paths"].append(theorem_out["experiment_summary_path"])
         results["method_order_report"]["theorem_regime"] = theorem_out["method_order_report"]
     if "high_dimensional_fixed" in selected:
-        hd_out = _run_high_dimensional_fixed(group_dir=group_dir, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
+        hd_out = _run_high_dimensional_fixed(group_dir=group_dir, output_root=output_root, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
         for key in ("manifest_paths", "memory_paths", "scale_log_paths", "figure_paths", "plot_metadata_paths", "table_paths"):
             results[key].extend(hd_out[key])
         results["aggregate_manifest_paths"].append(hd_out["aggregate_manifest_path"])
+        results["aggregate_summary_paths"].append(hd_out["aggregate_summary_path"])
         results["experiment_summary_paths"].append(hd_out["experiment_summary_path"])
         results["method_order_report"]["high_dimensional_fixed"] = hd_out["method_order_report"]
     if "refresh_sweep" in selected:
-        refresh_out = _run_refresh_sweep(group_dir=group_dir, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
+        refresh_out = _run_refresh_sweep(group_dir=group_dir, output_root=output_root, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
         for key in ("manifest_paths", "memory_paths", "scale_log_paths", "figure_paths", "plot_metadata_paths", "table_paths"):
             results[key].extend(refresh_out[key])
         results["aggregate_manifest_paths"].append(refresh_out["aggregate_manifest_path"])
+        results["aggregate_summary_paths"].append(refresh_out["aggregate_summary_path"])
         results["experiment_summary_paths"].append(refresh_out["experiment_summary_path"])
         results["method_order_report"]["refresh_sweep"] = refresh_out["method_order_report"]
     if "anisotropic_noise" in selected:
-        noise_out = _run_anisotropic_noise(group_dir=group_dir, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr, method_order=method_order)
+        noise_out = _run_anisotropic_noise(group_dir=group_dir, output_root=output_root, metadata=metadata, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr, method_order=method_order)
         for key in ("manifest_paths", "memory_paths", "scale_log_paths", "figure_paths", "plot_metadata_paths", "table_paths"):
             results[key].extend(noise_out[key])
         results["aggregate_manifest_paths"].append(noise_out["aggregate_manifest_path"])
+        results["aggregate_summary_paths"].append(noise_out["aggregate_summary_path"])
         results["experiment_summary_paths"].append(noise_out["experiment_summary_path"])
         results["method_order_report"]["anisotropic_noise"] = noise_out["method_order_report"]
     exact_out = _run_exact_fira_fixture(group_dir=group_dir)
     results["exact_fira_summary_path"] = exact_out["summary_path"]
     results["ldadam_status_path"] = _write_ldadam_status(group_dir)
     write_json_strict(group_dir / "run_manifest_index.json", {"run_id": run_id, "manifest_paths": [str(path) for path in results["manifest_paths"]]}, sort_keys=True)
+    memory_runtime_summary_path = _write_memory_runtime_summary(group_dir=group_dir, manifest_paths=results["manifest_paths"], memory_paths=results["memory_paths"])
+    scale_log_summary_path = _write_scale_log_summary(group_dir=group_dir, manifest_paths=results["manifest_paths"], scale_log_paths=results["scale_log_paths"])
+    results["memory_runtime_summary_path"] = memory_runtime_summary_path
+    results["scale_log_summary_path"] = scale_log_summary_path
+    artifact_index_path = _write_artifact_index(
+        group_dir=group_dir,
+        output_root=output_root,
+        metadata=metadata,
+        run_id=run_id,
+        paper_quality=paper_quality,
+        tiny=tiny,
+        parent_pr=parent_pr,
+        command=command,
+        results=results,
+        memory_runtime_summary_path=memory_runtime_summary_path,
+        scale_log_summary_path=scale_log_summary_path,
+    )
+    results["artifact_index_path"] = artifact_index_path
+    if review_snapshot_dir is not None:
+        results["review_snapshot_dir"] = _write_review_snapshot(group_dir=group_dir, artifact_index_path=artifact_index_path, review_snapshot_dir=Path(review_snapshot_dir))
     return results

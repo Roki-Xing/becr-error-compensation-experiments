@@ -22,3 +22,56 @@ jobs:
         run: python -m moving_projection_state.artifact_check --artifact-dir experiments/tier1-synthetic/moving_projection_artifacts/20260627T000000Z_p0_moving_projection_state --smoke-generate
       - name: Smoke-generate provenance artifacts
         run: python experiments/tier1-synthetic/run_provenance_smoke.py --output-root /tmp/becr_provenance_smoke --run-id ci_smoke --paper-quality
+  corrected-synthetic-tiny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Run corrected synthetic tiny paper-quality suite
+        run: |
+          python experiments/tier1-synthetic/run_corrected_synthetic_suite.py \
+            --output-root /tmp/becr_p1_corrected_synthetic_ci \
+            --run-id ci_corrected_synthetic \
+            --paper-quality \
+            --tiny \
+            --parent-pr "#4"
+      - name: Validate corrected synthetic artifact index
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("/tmp/becr_p1_corrected_synthetic_ci/ci_corrected_synthetic")
+          artifact_index = json.loads((root / "artifact_index.json").read_text(encoding="utf-8"))
+          required = [
+              "aggregate_manifest_paths",
+              "aggregate_summary_paths",
+              "experiment_summary_paths",
+              "figure_paths",
+              "figure_metadata_paths",
+              "table_paths",
+              "run_manifest_index_path",
+              "exact_fira_fixture_summary_path",
+              "ldadam_status_path",
+              "memory_runtime_summary_path",
+              "scale_log_summary_path",
+          ]
+          for key in required:
+              assert artifact_index[key], key
+          assert artifact_index["old_results_used"] is False
+          assert artifact_index["legacy_results_used"] is False
+          for key in required:
+              paths = artifact_index[key] if isinstance(artifact_index[key], list) else [artifact_index[key]]
+              for path in paths:
+                  assert Path(path).exists(), path
+          PY
+      - name: Upload corrected synthetic tiny review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrected-synthetic-tiny-review
+          path: /tmp/becr_p1_corrected_synthetic_ci/ci_corrected_synthetic

@@ -21,7 +21,9 @@ def main() -> None:
     parser.add_argument("--tiny", action="store_true")
     parser.add_argument("--parent-pr", type=str, default=None)
     parser.add_argument("--experiments", nargs="*", default=None)
+    parser.add_argument("--review-snapshot-dir", type=Path, default=None)
     args = parser.parse_args()
+    command = "python " + " ".join([str(Path(__file__).as_posix()), *sys.argv[1:]])
     result = run_corrected_synthetic_suite(
         output_root=args.output_root,
         run_id=args.run_id,
@@ -31,10 +33,15 @@ def main() -> None:
         tiny=args.tiny,
         parent_pr=args.parent_pr,
         experiments=args.experiments,
+        command=command,
+        review_snapshot_dir=args.review_snapshot_dir,
     )
     print(f"group_dir={result['group_dir']}")
+    print(f"artifact_index={result['artifact_index_path']}")
     for path in result["aggregate_manifest_paths"]:
         print(f"aggregate_manifest={path}")
+    if "review_snapshot_dir" in result:
+        print(f"review_snapshot_dir={result['review_snapshot_dir']}")
 
 
 if __name__ == "__main__":

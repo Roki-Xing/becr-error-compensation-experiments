@@ -20,6 +20,7 @@ def _write_plot_metadata(
     aggregate_manifest_path: Path,
     aggregate_manifest: dict[str, Any],
     candidate_level: str,
+    main_or_appendix_recommendation: str,
 ) -> Path:
     meta = {
         "title": title,
@@ -31,6 +32,8 @@ def _write_plot_metadata(
         "config_hashes": aggregate_manifest["config_hashes"],
         "noise_hashes": aggregate_manifest["noise_hashes"],
         "candidate_level": candidate_level,
+        "figure_candidate_level": candidate_level,
+        "main_or_appendix_recommendation": main_or_appendix_recommendation,
     }
     meta_path = path_base.with_suffix(".metadata.json")
     write_json_strict(meta_path, meta, sort_keys=True)
@@ -101,6 +104,7 @@ def plot_theorem_regime(
         aggregate_manifest_path=aggregate_manifest_path,
         aggregate_manifest=aggregate_manifest,
         candidate_level="main-candidate",
+        main_or_appendix_recommendation="main-candidate",
     )
     return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}
 
@@ -144,6 +148,7 @@ def plot_high_dimensional(
         aggregate_manifest_path=aggregate_manifest_path,
         aggregate_manifest=aggregate_manifest,
         candidate_level="main-or-appendix",
+        main_or_appendix_recommendation="main-or-appendix",
     )
     return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}
 
@@ -181,6 +186,7 @@ def plot_refresh_sweep(
         aggregate_manifest_path=aggregate_manifest_path,
         aggregate_manifest=aggregate_manifest,
         candidate_level="main-or-appendix",
+        main_or_appendix_recommendation="main-or-appendix",
     )
     return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}
 
@@ -232,5 +238,6 @@ def plot_anisotropic_noise(
         aggregate_manifest_path=aggregate_manifest_path,
         aggregate_manifest=aggregate_manifest,
         candidate_level="appendix-or-main-panel",
+        main_or_appendix_recommendation="appendix-or-main-panel",
     )
     return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}
