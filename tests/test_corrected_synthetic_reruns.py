@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from corrected_synthetic.runner import run_corrected_synthetic_suite, theorem_condition_report
+from corrected_synthetic.runner import (
+    _claim_summary_for_anisotropic,
+    run_corrected_synthetic_suite,
+    theorem_condition_report,
+)
 
 
 def _read_json(path: Path):
@@ -139,6 +143,44 @@ def test_anisotropic_summary_records_paired_differences_and_baseline_nuance(full
     assert isinstance(claims["becr_beats_raw_on_grad_norm_mean"], bool)
     assert isinstance(claims["becr_beats_projected_baseline_on_grad_norm_mean"], bool)
     assert "projected baseline" in claims["statement"]
+
+
+def test_anisotropic_claim_summary_text_matches_booleans():
+    def build_summary(becr: float, clipped: float, raw: float, proj: float) -> dict:
+        return {
+            "methods": {
+                "becr": {"grad_norm_mean": becr},
+                "fira_clipped": {"grad_norm_mean": clipped},
+                "fira_raw": {"grad_norm_mean": raw},
+                "proj_baseline": {"grad_norm_mean": proj},
+            }
+        }
+
+    case_a = _claim_summary_for_anisotropic(build_summary(0.9, 0.8, 0.7, 1.0))
+    assert case_a["becr_beats_clipped_on_grad_norm_mean"] is False
+    assert case_a["becr_beats_raw_on_grad_norm_mean"] is False
+    assert case_a["becr_beats_projected_baseline_on_grad_norm_mean"] is True
+    assert "improves over clipped/raw" not in case_a["statement"]
+
+    case_b = _claim_summary_for_anisotropic(build_summary(0.5, 0.8, 0.7, 0.4))
+    assert case_b["becr_beats_clipped_on_grad_norm_mean"] is True
+    assert case_b["becr_beats_raw_on_grad_norm_mean"] is True
+    assert case_b["becr_beats_projected_baseline_on_grad_norm_mean"] is False
+    assert "improves over clipped/raw" in case_b["statement"]
+    assert "does not beat the projected baseline" in case_b["statement"]
+
+    case_c = _claim_summary_for_anisotropic(build_summary(0.4, 0.8, 0.7, 0.5))
+    assert case_c["becr_beats_clipped_on_grad_norm_mean"] is True
+    assert case_c["becr_beats_raw_on_grad_norm_mean"] is True
+    assert case_c["becr_beats_projected_baseline_on_grad_norm_mean"] is True
+    assert "narrow synthetic diagnostic" in case_c["statement"]
+    assert "not a broad optimizer superiority claim" in case_c["statement"]
+
+    case_d = _claim_summary_for_anisotropic(build_summary(0.9, 0.8, 0.7, 0.6))
+    assert case_d["becr_beats_clipped_on_grad_norm_mean"] is False
+    assert case_d["becr_beats_raw_on_grad_norm_mean"] is False
+    assert case_d["becr_beats_projected_baseline_on_grad_norm_mean"] is False
+    assert "no supported improvement" in case_d["statement"]
 
 
 def test_artifact_index_lists_all_review_files(full_tiny_suite: dict):

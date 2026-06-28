@@ -373,10 +373,40 @@ def _claim_summary_for_anisotropic(summary: dict[str, Any]) -> dict[str, Any]:
     becr_beats_clipped = bool(becr < clipped)
     becr_beats_raw = bool(becr < raw)
     becr_beats_proj = bool(becr < proj)
-    if becr_beats_proj:
-        statement = "In this anisotropic synthetic setting, BECR improves over clipped/raw and also beats the projected baseline on mean final gradient norm."
+    if becr_beats_clipped and becr_beats_raw:
+        if becr_beats_proj:
+            statement = (
+                "In this anisotropic synthetic diagnostic, BECR improves over clipped/raw on mean final gradient norm "
+                "and also beats the projected baseline in this setting. This is a narrow synthetic diagnostic, not a broad optimizer superiority claim."
+            )
+        else:
+            statement = (
+                "In this anisotropic synthetic diagnostic, BECR improves over clipped/raw on mean final gradient norm "
+                "under paired noisy projection, but does not beat the projected baseline in this setting."
+            )
+    elif becr_beats_clipped or becr_beats_raw:
+        pairwise = "clipped" if becr_beats_clipped else "raw"
+        missing = "raw" if becr_beats_clipped else "clipped"
+        if becr_beats_proj:
+            statement = (
+                f"In this anisotropic synthetic diagnostic, BECR beats {pairwise} and the projected baseline on mean final gradient norm, "
+                f"but it does not improve over {missing}. This remains a narrow setting-specific result."
+            )
+        else:
+            statement = (
+                f"In this anisotropic synthetic diagnostic, BECR beats {pairwise} on mean final gradient norm, "
+                f"but it does not improve over {missing} or the projected baseline in this setting."
+            )
+    elif becr_beats_proj:
+        statement = (
+            "In this anisotropic synthetic diagnostic, BECR beats the projected baseline on mean final gradient norm in this setting, "
+            "but it does not improve over clipped/raw."
+        )
     else:
-        statement = "In this anisotropic synthetic setting, BECR improves over clipped/raw under paired noisy projection, but does not beat the projected baseline on mean final gradient norm."
+        statement = (
+            "In this anisotropic synthetic diagnostic, no supported improvement is recorded for BECR over clipped/raw or the projected baseline "
+            "on mean final gradient norm."
+        )
     return {
         "becr_beats_clipped_on_grad_norm_mean": becr_beats_clipped,
         "becr_beats_raw_on_grad_norm_mean": becr_beats_raw,
