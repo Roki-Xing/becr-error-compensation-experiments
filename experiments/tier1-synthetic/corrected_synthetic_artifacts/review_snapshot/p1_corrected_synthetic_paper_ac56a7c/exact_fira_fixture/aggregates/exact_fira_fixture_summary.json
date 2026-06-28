@@ -1,0 +1,101 @@
+{
+  "candidate_final_grad_norm": 0.7495593870109786,
+  "first_mismatch": "none",
+  "fixture_id": "shape_2x1_rank1_gap1_fp64",
+  "max_errors": {
+    "applied_recovery_scale": {
+      "abs": 1.7763568394002505e-15,
+      "rel": 3.678981706716998e-16
+    },
+    "bias_correction1": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "bias_correction2": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "candidate_recovery_update": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "complete_applied_update": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "complete_update_before_weight_decay": {
+      "abs": 8.881784197001252e-16,
+      "rel": 2.808802394873056e-16
+    },
+    "effective_recovery_update": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "exp_avg_after": {
+      "abs": 1.1102230246251565e-16,
+      "rel": 2.102677825094964e-16
+    },
+    "exp_avg_before": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "exp_avg_sq_after": {
+      "abs": 8.673617379884035e-19,
+      "rel": 1.4135767095670319e-16
+    },
+    "exp_avg_sq_before": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "invariant_projector_after": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "limiter_factor": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "normalized_low_rank_update": {
+      "abs": 8.881784197001252e-16,
+      "rel": 2.808802394873056e-16
+    },
+    "parameter_after": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "parameter_before": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "projected_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "raw_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "raw_recovery_scale": {
+      "abs": 1.7763568394002505e-15,
+      "rel": 3.678981706716998e-16
+    },
+    "reconstructed_projected_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "remainder_gradient": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "step_size": {
+      "abs": 0.0,
+      "rel": 0.0
+    },
+    "weight_decay_contribution": {
+      "abs": 0.0,
+      "rel": 0.0
+    }
+  },
+  "method_class": "official_fira_oracle_fixture",
+  "oracle_final_grad_norm": 0.7495593870109786
+}

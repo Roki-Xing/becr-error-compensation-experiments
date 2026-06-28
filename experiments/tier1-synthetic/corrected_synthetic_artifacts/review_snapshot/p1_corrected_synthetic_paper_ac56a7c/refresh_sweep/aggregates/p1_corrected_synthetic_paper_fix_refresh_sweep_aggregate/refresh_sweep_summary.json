@@ -1,0 +1,244 @@
+{
+  "K_values": [
+    1,
+    10,
+    50,
+    200,
+    "inf"
+  ],
+  "K_values_numeric": [
+    1.0,
+    10.0,
+    50.0,
+    200.0,
+    1000000.0
+  ],
+  "aggregate_id": "p1_corrected_synthetic_paper_fix_refresh_sweep_aggregate",
+  "coordinate_family": {
+    "becr": {
+      "grad_norm_final": [
+        0.01670953877214785,
+        0.020818144615366567,
+        0.025754283230494966,
+        0.037772387542510284,
+        0.04507824474747176
+      ],
+      "label": "becr",
+      "residual_norm_final": [
+        0.012664121042818355,
+        0.017542841483933987,
+        0.020482032818536753,
+        0.03777945945080346,
+        0.045408796560516475
+      ]
+    },
+    "fira_clipped": {
+      "grad_norm_final": [
+        0.02134780526338048,
+        0.021670131438842215,
+        0.026028456011730833,
+        0.03776414400111908,
+        0.04504626156550868
+      ],
+      "label": "fira_clipped",
+      "residual_norm_final": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "fira_raw": {
+      "grad_norm_final": [
+        0.045153783851464804,
+        0.04080282628301647,
+        0.06052764259758695,
+        0.4210596420302902,
+        0.7590773269163283
+      ],
+      "label": "fira_raw",
+      "residual_norm_final": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "proj_baseline": {
+      "grad_norm_final": [
+        0.0660718926195125,
+        0.0593069130534495,
+        0.07440749687357916,
+        0.6691579070691988,
+        1.2079945935836196
+      ],
+      "label": "proj_baseline",
+      "residual_norm_final": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "experiment_name": "refresh_sweep",
+  "paper_quality": true,
+  "seed_count": 1,
+  "source_manifest_paths": [
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_proj_baseline_seed000_20260628T143507Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_raw_seed000_20260628T143507Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_clipped_seed000_20260628T143508Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_becr_seed000_20260628T143508Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_state_reset_explicit_seed000_20260628T143509Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_official_fira_carry_seed000_20260628T143509Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_projection_aware_transport_seed000_20260628T143509Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_full_residual_current_projection_seed000_20260628T143509Z_ac56a7c_9eaf4062/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_proj_baseline_seed000_20260628T143509Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_fira_raw_seed000_20260628T143510Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_fira_clipped_seed000_20260628T143510Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_becr_seed000_20260628T143511Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k10_state_reset_explicit_seed000_20260628T143511Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k10_official_fira_carry_seed000_20260628T143511Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k10_projection_aware_transport_seed000_20260628T143511Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k10_full_residual_current_projection_seed000_20260628T143512Z_ac56a7c_c0e19070/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_proj_baseline_seed000_20260628T143512Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_fira_raw_seed000_20260628T143512Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_fira_clipped_seed000_20260628T143513Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_becr_seed000_20260628T143513Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k50_state_reset_explicit_seed000_20260628T143514Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k50_official_fira_carry_seed000_20260628T143514Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k50_projection_aware_transport_seed000_20260628T143514Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k50_full_residual_current_projection_seed000_20260628T143514Z_ac56a7c_86676206/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_proj_baseline_seed000_20260628T143514Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_fira_raw_seed000_20260628T143515Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_fira_clipped_seed000_20260628T143515Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_becr_seed000_20260628T143516Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k200_state_reset_explicit_seed000_20260628T143516Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k200_official_fira_carry_seed000_20260628T143516Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k200_projection_aware_transport_seed000_20260628T143516Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k200_full_residual_current_projection_seed000_20260628T143517Z_ac56a7c_0c250fea/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_proj_baseline_seed000_20260628T143517Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_fira_raw_seed000_20260628T143517Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_fira_clipped_seed000_20260628T143518Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_becr_seed000_20260628T143518Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_state_reset_explicit_seed000_20260628T143519Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_official_fira_carry_seed000_20260628T143519Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_projection_aware_transport_seed000_20260628T143519Z_ac56a7c_fef1fe9a/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_full_residual_current_projection_seed000_20260628T143519Z_ac56a7c_fef1fe9a/manifest.json"
+  ],
+  "source_run_ids": [
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_proj_baseline_seed000_20260628T143507Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_raw_seed000_20260628T143507Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_clipped_seed000_20260628T143508Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_becr_seed000_20260628T143508Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k1_state_reset_explicit_seed000_20260628T143509Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k1_official_fira_carry_seed000_20260628T143509Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k1_projection_aware_transport_seed000_20260628T143509Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k1_full_residual_current_projection_seed000_20260628T143509Z_ac56a7c_9eaf4062",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_proj_baseline_seed000_20260628T143509Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_fira_raw_seed000_20260628T143510Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_fira_clipped_seed000_20260628T143510Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k10_becr_seed000_20260628T143511Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k10_state_reset_explicit_seed000_20260628T143511Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k10_official_fira_carry_seed000_20260628T143511Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k10_projection_aware_transport_seed000_20260628T143511Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k10_full_residual_current_projection_seed000_20260628T143512Z_ac56a7c_c0e19070",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_proj_baseline_seed000_20260628T143512Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_fira_raw_seed000_20260628T143512Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_fira_clipped_seed000_20260628T143513Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k50_becr_seed000_20260628T143513Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k50_state_reset_explicit_seed000_20260628T143514Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k50_official_fira_carry_seed000_20260628T143514Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k50_projection_aware_transport_seed000_20260628T143514Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k50_full_residual_current_projection_seed000_20260628T143514Z_ac56a7c_86676206",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_proj_baseline_seed000_20260628T143514Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_fira_raw_seed000_20260628T143515Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_fira_clipped_seed000_20260628T143515Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_k200_becr_seed000_20260628T143516Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k200_state_reset_explicit_seed000_20260628T143516Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k200_official_fira_carry_seed000_20260628T143516Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k200_projection_aware_transport_seed000_20260628T143516Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_k200_full_residual_current_projection_seed000_20260628T143517Z_ac56a7c_0c250fea",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_proj_baseline_seed000_20260628T143517Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_fira_raw_seed000_20260628T143517Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_fira_clipped_seed000_20260628T143518Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_coord_kinf_becr_seed000_20260628T143518Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_state_reset_explicit_seed000_20260628T143519Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_official_fira_carry_seed000_20260628T143519Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_projection_aware_transport_seed000_20260628T143519Z_ac56a7c_fef1fe9a",
+    "p1_corrected_synthetic_reruns_refresh_sweep_state_kinf_full_residual_current_projection_seed000_20260628T143519Z_ac56a7c_fef1fe9a"
+  ],
+  "state_modes": {
+    "full_residual_current_projection": {
+      "grad_norm_final": [
+        0.006249004431543482,
+        0.006164639151369992,
+        0.0062115675732319076,
+        0.012722553294324007,
+        0.01684532717202856
+      ],
+      "label": "full_residual_current_projection",
+      "residual_norm_final": [
+        1.0727165343616119e-05,
+        0.00045563977043837855,
+        0.0014277852326815166,
+        0.012836708496422239,
+        0.01701457507321109
+      ]
+    },
+    "official_fira_carry": {
+      "grad_norm_final": [
+        2.708273805233639e-07,
+        7.470550968406661e-05,
+        0.0011522919666544374,
+        0.012758514177733644,
+        0.016890075033138333
+      ],
+      "label": "official_fira_carry",
+      "residual_norm_final": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "projection_aware_transport": {
+      "grad_norm_final": [
+        0.009409248698180373,
+        0.016020717819389314,
+        0.006871813719537261,
+        0.012758456091685619,
+        0.016890075033138333
+      ],
+      "label": "projection_aware_transport",
+      "residual_norm_final": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "state_reset_explicit": {
+      "grad_norm_final": [
+        0.33178805023071545,
+        0.28999391262150864,
+        0.0026395852048058037,
+        0.012780329637459406,
+        0.01684532717202856
+      ],
+      "label": "state_reset_explicit",
+      "residual_norm_final": [
+        0.01542071197028676,
+        0.003615679529918984,
+        0.000849754055302997,
+        0.012895390044873912,
+        0.01701457507321109
+      ]
+    }
+  }
+}

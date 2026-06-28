@@ -1,0 +1,170 @@
+{
+  "experiments": {
+    "anisotropic_noise": {
+      "count": 30,
+      "methods": [
+        "proj_baseline",
+        "fira_raw",
+        "fira_clipped",
+        "becr",
+        "rho_no_lower_bound",
+        "coupled_unbounded"
+      ],
+      "representative_scale_logs": [
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed000_20260628T143520Z_ac56a7c_138da036/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed000_20260628T143521Z_ac56a7c_138da036/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed000_20260628T143521Z_ac56a7c_138da036/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed000_20260628T143522Z_ac56a7c_138da036/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed000_20260628T143523Z_ac56a7c_138da036/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed000_20260628T143523Z_ac56a7c_138da036/scale_log.jsonl"
+      ]
+    },
+    "high_dimensional_fixed": {
+      "count": 36,
+      "methods": [
+        "proj_baseline",
+        "fira_raw",
+        "fira_clipped",
+        "becr",
+        "rho_no_lower_bound",
+        "coupled_unbounded"
+      ],
+      "representative_scale_logs": [
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_proj_baseline_seed000_20260628T143331Z_ac56a7c_811039d8/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_raw_seed000_20260628T143334Z_ac56a7c_811039d8/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_clipped_seed000_20260628T143336Z_ac56a7c_811039d8/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_becr_seed000_20260628T143338Z_ac56a7c_811039d8/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_rho_no_lower_bound_seed000_20260628T143341Z_ac56a7c_811039d8/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_coupled_unbounded_seed000_20260628T143343Z_ac56a7c_811039d8/scale_log.jsonl"
+      ]
+    },
+    "refresh_sweep": {
+      "count": 40,
+      "methods": [
+        "proj_baseline",
+        "fira_raw",
+        "fira_clipped",
+        "becr",
+        "state_reset_explicit",
+        "official_fira_carry",
+        "projection_aware_transport",
+        "full_residual_current_projection"
+      ],
+      "representative_scale_logs": [
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_proj_baseline_seed000_20260628T143507Z_ac56a7c_9eaf4062/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_raw_seed000_20260628T143507Z_ac56a7c_9eaf4062/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_fira_clipped_seed000_20260628T143508Z_ac56a7c_9eaf4062/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_coord_k1_becr_seed000_20260628T143508Z_ac56a7c_9eaf4062/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_state_reset_explicit_seed000_20260628T143509Z_ac56a7c_9eaf4062/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/refresh_sweep/runs/p1_corrected_synthetic_reruns_refresh_sweep_state_k1_official_fira_carry_seed000_20260628T143509Z_ac56a7c_9eaf4062/scale_log.jsonl"
+      ]
+    },
+    "theorem_regime": {
+      "count": 6,
+      "methods": [
+        "proj_baseline",
+        "fira_raw",
+        "fira_clipped",
+        "becr",
+        "rho_no_lower_bound",
+        "coupled_unbounded"
+      ],
+      "representative_scale_logs": [
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_proj_baseline_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_raw_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_clipped_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_becr_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_rho_no_lower_bound_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl",
+        "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_coupled_unbounded_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl"
+      ]
+    }
+  },
+  "representative_rows": [
+    {
+      "experiment_name": "theorem_regime",
+      "method": "proj_baseline",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_proj_baseline_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_proj_baseline_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "theorem_regime",
+      "method": "fira_raw",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_fira_raw_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_raw_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "theorem_regime",
+      "method": "fira_clipped",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_fira_clipped_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_clipped_seed000_20260628T143328Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "theorem_regime",
+      "method": "becr",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_becr_seed000_20260628T143329Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_becr_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "theorem_regime",
+      "method": "rho_no_lower_bound",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_rho_no_lower_bound_seed000_20260628T143329Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_rho_no_lower_bound_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "theorem_regime",
+      "method": "coupled_unbounded",
+      "run_id": "p1_corrected_synthetic_reruns_theorem_regime_coupled_unbounded_seed000_20260628T143329Z_ac56a7c_990cd5c7",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_coupled_unbounded_seed000_20260628T143329Z_ac56a7c_990cd5c7/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "proj_baseline",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_proj_baseline_seed000_20260628T143331Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_proj_baseline_seed000_20260628T143331Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "fira_raw",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_raw_seed000_20260628T143334Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_raw_seed000_20260628T143334Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "fira_clipped",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_clipped_seed000_20260628T143336Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_fira_clipped_seed000_20260628T143336Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "becr",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_becr_seed000_20260628T143338Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_becr_seed000_20260628T143338Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "rho_no_lower_bound",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_rho_no_lower_bound_seed000_20260628T143341Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_rho_no_lower_bound_seed000_20260628T143341Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    },
+    {
+      "experiment_name": "high_dimensional_fixed",
+      "method": "coupled_unbounded",
+      "run_id": "p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_coupled_unbounded_seed000_20260628T143343Z_ac56a7c_811039d8",
+      "scale_log_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/high_dimensional_fixed/runs/p1_corrected_synthetic_reruns_high_dimensional_fixed_flat_coupled_unbounded_seed000_20260628T143343Z_ac56a7c_811039d8/scale_log.jsonl",
+      "scale_logging_schema": "raw_applied_effective_v1"
+    }
+  ],
+  "row_count": 112,
+  "run_id": "p1_corrected_synthetic_paper_fix"
+}
