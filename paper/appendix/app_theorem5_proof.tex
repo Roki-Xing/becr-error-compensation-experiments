@@ -1,0 +1,14 @@
+\textbf{Status.} TODO: integrate the accepted \BECR-SGD proof text.
+
+\medskip
+\noindent
+The proof should remain scoped to SGD and should not be rewritten as an Adam
+convergence theorem. The intended structure is:
+\begin{enumerate}[leftmargin=1.5em]
+\item define the perturbed iterate using the raw-gradient residual buffer;
+\item use Proposition~\ref{prop:becr-contractivity} to control the residual;
+\item separate the bounded transmission factor $\rho_t$ from the adaptive scale
+      $s_t$;
+\item derive the standard smooth nonconvex telescoping bound with
+      $O(T^{-1/2})$ average gradient norm.
+\end{enumerate}

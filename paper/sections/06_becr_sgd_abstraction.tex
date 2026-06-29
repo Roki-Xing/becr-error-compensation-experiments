@@ -1,0 +1,46 @@
+\section{\BECR-SGD Abstraction}
+
+The $2$D repair theorem motivates a stochastic abstraction in which raw
+discarded-gradient mass is transmitted through a bounded contractive operator
+and only then scaled by a bounded adaptive recovery factor.
+
+\begin{theorem}[\BECR-SGD nonconvex convergence]
+\label{thm:becr-sgd}
+Consider stochastic gradients $g_t$ with
+$\E[g_t\mid x_t]=\grad f(x_t)$ and bounded variance $\sigma^2$, where $f$ is
+$L$-smooth and lower bounded. Let $C_t$ be a sequence of projectors or
+compressors satisfying an expected contractivity condition as in
+Proposition~\ref{prop:becr-contractivity}, and let the raw-gradient residual
+state evolve as
+\[
+A_t = g_t + E_t,\qquad
+R_t = C_t(A_t),\qquad
+H_t = A_t - R_t,
+\]
+\[
+Z_t = \rho_t H_t,\qquad
+Z_t^{\mathrm{eff}} = \tau_t Z_t,\qquad
+E_{t+1}=H_t-Z_t^{\mathrm{eff}},
+\]
+with bounded transmission and bounded recovery scales,
+\[
+0<\rho_{\min}\le \rho_t \le \rho_{\max}\le 1,\qquad
+0<s_{\min}\le s_t \le s_{\max}<\infty.
+\]
+Update the parameters by
+\[
+x_{t+1}=x_t-\eta_t\bigl(R_t+s_t Z_t^{\mathrm{eff}}\bigr).
+\]
+Then, for the SGD abstraction with $\eta_t=\Theta(T^{-1/2})$,
+\[
+\frac{1}{T}\sum_{t=0}^{T-1}\E\!\left[\norm{\grad f(x_t)}^2\right]
+= O(T^{-1/2}),
+\]
+with constants depending on $L$, $\sigma^2$, the contractivity of $C_t$, and
+the bounds on $\rho_t$ and $s_t$.
+\end{theorem}
+
+The scope of Theorem~\ref{thm:becr-sgd} is intentionally narrow. It is an
+SGD-style abstraction of a raw-gradient residual transmission mechanism; it is
+not an Adam convergence theorem, does not compensate compressed Adam optimizer
+states, and does not subsume LDAdam-style generalized Error Feedback.

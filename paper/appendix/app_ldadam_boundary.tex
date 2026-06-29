@@ -1,0 +1,15 @@
+LDAdam is the closest related method and the largest novelty risk. LDAdam
+compensates low-dimensional Adam gradient and optimizer-state compression
+errors through generalized Error Feedback and projection-aware state updates.
+Our work addresses a different mechanism: the \Fira-style full-rank recovery
+branch, where a discarded gradient component is reintroduced through norm-based
+scaling. \BECR\ separates raw-gradient residual transmission from adaptive
+recovery scaling in that branch. The \BECR-SGD theorem does not compensate Adam
+optimizer-state compression, does not subsume LDAdam, and should not be read as
+an Adam convergence theorem \citep{ldadam}.
+
+\begin{table}[h]
+\caption{Compact related-work boundary table.}
+\label{tab:related-work}
+\input{tables/related_work_table}
+\end{table}

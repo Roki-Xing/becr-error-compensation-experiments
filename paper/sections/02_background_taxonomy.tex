@@ -1,0 +1,47 @@
+\section{Background and Taxonomy}
+
+Let $g_t=\grad f(x_t)$ and let $C_t$ denote a low-rank projection or
+compression operator. For an orthogonal projector $C_t(v)=P_tP_t^\top v$, the
+discarded component is $(I-C_t)g_t$. Three mechanisms should be distinguished.
+
+\paragraph{Pure projection.}
+Projected optimization updates only $C_t(g_t)$ and discards
+$(I-C_t)g_t$. If the subspace is stale, the orthogonal gradient can persist
+even while the projected part becomes small.
+
+\paragraph{\Fira-style norm recovery.}
+The current gradient is decomposed into a projected branch and a discarded
+branch,
+\[
+R_t=P_t^\top g_t,\qquad g_t^\perp=(I-P_tP_t^\top)g_t.
+\]
+A low-rank adaptive map produces $\psi_t(R_t)$, and the discarded branch is
+reintroduced through a scalar or column-wise factor,
+\[
+u_t^\parallel = P_t \psi_t(R_t),\qquad
+u_t^\perp = s_t g_t^\perp,\qquad
+s_t \approx \phi_t(R_t).
+\]
+This mechanism uses the \emph{current} projected adaptive statistics to scale
+the \emph{current} discarded gradient. It does not, by itself, maintain a
+residual buffer that guarantees later correction of under-transmitted mass.
+
+\paragraph{Error Feedback.}
+Classical Error Feedback forms an accumulator
+\[
+a_t = g_t + e_t,\qquad c_t = C_t(a_t),\qquad e_{t+1}=a_t-c_t,
+\]
+and applies the compressed direction $c_t$ to the parameters. The defining
+feature is the residual state $e_t$, not merely the presence of a discarded
+component in the current step.
+
+\paragraph{\BECR notation and units.}
+Throughout the paper, $E_t$, $H_t$, $Z_t$, and $Z_t^{\mathrm{eff}}$ are stored
+in raw-gradient units. The scalar $\rho_t$ is a raw-gradient residual
+transmission factor, while $s_t$ is an adaptive recovery or preconditioning
+scale. The preconditioned orthogonal update is
+\[
+U_t^\perp = s_t Z_t^{\mathrm{eff}}.
+\]
+Residual updates never contain the learning rate; the learning rate appears
+only in the parameter update.

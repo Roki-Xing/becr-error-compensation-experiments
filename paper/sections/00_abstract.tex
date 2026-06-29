@@ -1,0 +1,18 @@
+\begin{abstract}
+Low-rank Adam methods introduce two different distortions: they omit gradient
+components outside the maintained subspace, and they typically omit full-space
+adaptive optimizer states for those discarded directions. \Fira-style recovery
+addresses only the first distortion through a norm-based full-rank correction:
+it projects the current gradient, applies a low-rank adaptive optimizer to the
+projected part, and rescales the discarded component by a scalar or column-wise
+ratio. We show that this mechanism is not Error Feedback. In a verified
+two-dimensional stale-subspace regime, positive-$\epsilon$ recovery can drive
+the projected coordinate to zero while the cumulative recovery mass remains
+finite, leaving a nonzero orthogonal gradient. Lower-bounded clipping repairs
+that failure, and a separated raw-gradient residual transmission mechanism,
+\BECR, repairs the same regime while keeping residuals in raw-gradient units.
+We then state a \BECR-SGD abstraction and evaluate the mechanism on corrected
+synthetic diagnostics with explicit provenance, common random numbers, and
+figure-level traceability. The resulting paper is a theory/mechanism study: it
+does not claim Adam convergence, optimizer superiority, or neural validation.
+\end{abstract}

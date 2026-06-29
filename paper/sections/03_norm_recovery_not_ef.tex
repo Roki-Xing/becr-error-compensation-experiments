@@ -1,0 +1,23 @@
+\section{Norm Recovery Is Not Error Feedback}
+
+The central taxonomy claim is structural rather than empirical: norm recovery
+and Error Feedback manipulate different objects. Error Feedback stores the
+untransmitted raw-gradient mass, while \Fira-style norm recovery constructs a
+one-step full-rank correction from projected adaptive information. The two can
+coincide only under strong alignment assumptions between projected adaptive
+statistics and omitted coordinates.
+
+This distinction matters in stale-subspace regimes. If $R_t$ becomes small
+while $g_t^\perp$ remains nonzero, then the scalar or column-wise recovery
+factor can shrink even though the orthogonal gradient has not been removed. In
+that case, the cumulative mass sent through the recovery branch can remain
+finite. Classical Error Feedback does not suffer from that specific mechanism
+because the missing raw-gradient mass is preserved in the residual state.
+
+The claim should also not be overstated. We do not argue that official
+\Fira generally fails, nor that exact-SVD refresh cannot escape specific stale
+counterexamples. The exact-Fira parity harness in this repository validates a
+read-only oracle only on tested small matrix fixtures; it does not certify all
+official code paths. Our point is narrower: a norm-scaled full-rank recovery
+branch is not the same object as Error Feedback, and it admits a clean
+stale-subspace failure mode.

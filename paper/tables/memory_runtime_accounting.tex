@@ -1,0 +1,21 @@
+\centering
+\scriptsize
+\begin{tabularx}{\linewidth}{p{3.0cm}p{2.3cm}X}
+\toprule
+Tracked field & Present in corrected synthetic schema? & Allowed interpretation \\
+\midrule
+\texttt{parameter\_bytes} & Yes & CPU synthetic accounting only \\
+\texttt{gradient\_buffer\_bytes} & Yes & Buffer schema is tracked, not optimized here \\
+\texttt{first\_moment\_bytes} & Yes & Low-rank state size is recorded \\
+\texttt{second\_moment\_bytes} & Yes & Low-rank state size is recorded \\
+\texttt{projection\_bytes} & Yes & Projection storage is tracked \\
+\texttt{residual\_bytes} & Yes & Residual storage is explicitly counted \\
+\texttt{peak\_memory\_allocated}/\texttt{reserved} & Present but null on CPU smoke/review runs & No GPU memory-efficiency claim \\
+Wall-clock / step time & Yes & Diagnostic runtime only \\
+\bottomrule
+\end{tabularx}
+
+\medskip
+\noindent\textit{Caveat.} This table is CPU synthetic accounting only. It does
+not validate GPU peak memory, does not claim memory-neutrality, and should not
+be read as a systems efficiency result.

@@ -1,0 +1,21 @@
+\textbf{Status.} TODO: integrate the full accepted separated-$\rho/s$ proof.
+
+\medskip
+\noindent
+The proof must preserve the raw-gradient unit convention:
+\[
+h_t = b y_t + e_t,\qquad
+z_t = \rho h_t,\qquad
+e_{t+1}=h_t-z_t,\qquad
+y_{t+1}=y_t-\eta s_t z_t.
+\]
+The appendix should include the Schur/Jury verification for
+\[
+A=
+\begin{bmatrix}
+1-\eta b \rho s_{\min} & -\eta \rho s_{\min}\\
+b(1-\rho) & 1-\rho
+\end{bmatrix},
+\]
+with the exact sufficient condition
+$0<\rho<4/(2+\eta b s_{\min})$.

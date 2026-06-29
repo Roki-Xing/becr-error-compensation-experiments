@@ -1,0 +1,14 @@
+\textbf{Status.} TODO: integrate the accepted proof details if a longer version
+is desired.
+
+\medskip
+\noindent
+For an orthogonal projector $C(v)=PP^\top v$,
+\[
+v-\mathcal C_\rho(v)=(1-\rho)(I-C)v,
+\]
+so the squared error is
+\[
+\norm{v-\mathcal C_\rho(v)}^2=(1-\rho)^2\norm{(I-C)v}^2\le (1-\rho)^2\norm{v}^2.
+\]
+This is the contractive ingredient used by the \BECR-SGD abstraction.
