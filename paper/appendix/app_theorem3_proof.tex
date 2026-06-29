@@ -1,21 +1,122 @@
-\textbf{Status.} TODO: integrate the full accepted separated-$\rho/s$ proof.
-
-\medskip
-\noindent
-The proof must preserve the raw-gradient unit convention:
+The $x$-update in Theorem~\ref{thm:becr-repair} is identical to the one in
+Theorem~\ref{thm:positive-epsilon-failure}. Therefore $x_t\to 0$
+geometrically. Since $\epsilon_s>0$, this implies
 \[
-h_t = b y_t + e_t,\qquad
-z_t = \rho h_t,\qquad
+\phi(a x_t)\to 0.
+\]
+Because
+\[
+s_t=\operatorname{clip}\!\left(\phi(a x_t),s_{\min},s_{\max}\right)
+\]
+with $s_{\min}>0$, there exists $T_0<\infty$ such that
+\[
+s_t=s_{\min}\qquad\text{for all }t\ge T_0.
+\]
+
+For the raw-gradient residual branch, recall the raw-unit recursions
+\[
+h_t=b y_t+e_t,\qquad
+z_t=\rho h_t,\qquad
 e_{t+1}=h_t-z_t,\qquad
 y_{t+1}=y_t-\eta s_t z_t.
 \]
-The appendix should include the Schur/Jury verification for
+For every $t\ge T_0$, substituting $s_t=s_{\min}$ gives
 \[
+y_{t+1}
+=
+y_t-\eta s_{\min}\rho (b y_t+e_t)
+=
+(1-\eta b\rho s_{\min})y_t-\eta \rho s_{\min} e_t,
+\]
+and
+\[
+e_{t+1}
+=
+(1-\rho)(b y_t+e_t)
+=
+b(1-\rho)y_t+(1-\rho)e_t.
+\]
+Hence, for $t\ge T_0$,
+\[
+\begin{bmatrix}
+y_{t+1}\\ e_{t+1}
+\end{bmatrix}
+=
+A
+\begin{bmatrix}
+y_t\\ e_t
+\end{bmatrix},
+\qquad
 A=
 \begin{bmatrix}
-1-\eta b \rho s_{\min} & -\eta \rho s_{\min}\\
+1-\eta b\rho s_{\min} & -\eta \rho s_{\min}\\
 b(1-\rho) & 1-\rho
-\end{bmatrix},
+\end{bmatrix}.
 \]
-with the exact sufficient condition
-$0<\rho<4/(2+\eta b s_{\min})$.
+
+The characteristic polynomial of $A$ is
+\[
+\lambda^2
+-
+\bigl(2-\rho(1+\eta b s_{\min})\bigr)\lambda
++
+(1-\rho).
+\]
+Write it as $\lambda^2+a_1\lambda+a_0$ with
+\[
+a_1=-\bigl(2-\rho(1+\eta b s_{\min})\bigr),
+\qquad
+a_0=1-\rho.
+\]
+The Jury conditions for a monic quadratic are
+\[
+1+a_1+a_0>0,\qquad
+1-a_1+a_0>0,\qquad
+1-a_0>0.
+\]
+These become
+\[
+1+a_1+a_0=\eta b\rho s_{\min}>0,
+\]
+\[
+1-a_1+a_0=4-2\rho-\eta b\rho s_{\min}>0,
+\]
+\[
+1-a_0=\rho>0.
+\]
+The second inequality is equivalent to
+\[
+\rho<\frac{4}{2+\eta b s_{\min}}.
+\]
+Thus the assumption
+\[
+0<\rho<\frac{4}{2+\eta b s_{\min}}
+\]
+is exactly the Schur-stability condition for $A$.
+
+Therefore there exist constants $M>0$ and $\gamma\in(0,1)$ such that
+\[
+\left\|
+\begin{bmatrix}
+y_t\\ e_t
+\end{bmatrix}
+\right\|
+\le
+M\gamma^{\,t-T_0}
+\left\|
+\begin{bmatrix}
+y_{T_0}\\ e_{T_0}
+\end{bmatrix}
+\right\|
+\qquad\text{for all }t\ge T_0.
+\]
+Hence $(y_t,e_t)\to(0,0)$.
+
+Finally,
+\[
+\grad f(x_t,y_t)=(a x_t,b y_t)\to (0,0),
+\]
+so $\norm{\grad f(x_t,y_t)}\to 0$. Throughout the proof, the residual
+variables $h_t$, $z_t$, and $e_t$ remain in raw-gradient units, while the
+factor $s_t$ acts only in the parameter update. This proves
+Theorem~\ref{thm:becr-repair}.

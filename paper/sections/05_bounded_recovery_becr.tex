@@ -12,7 +12,7 @@ Theorem~\ref{thm:positive-epsilon-failure}, define
 \[
 s_t = \operatorname{clip}\!\left(\phi_t, s_{\min}, s_{\max}\right),
 \qquad
-0<s_{\min}\le s_{\max}<\infty,
+0<s_{\min}\le s_{\max}<\frac{2}{\eta b},
 \]
 and update
 \[
@@ -20,7 +20,7 @@ x_{t+1}=x_t-\eta \frac{a x_t}{|a x_t|+\epsilon_a},
 \qquad
 y_{t+1}=y_t-\eta s_t b y_t.
 \]
-If $0<\eta a<2\epsilon_a$ and $0<\eta b s_{\min}<2$, then
+If $0<\eta a<2\epsilon_a$, then
 \[
 x_t\to 0,\qquad y_t\to 0,\qquad \norm{\grad f(x_t,y_t)}\to 0.
 \]
@@ -83,21 +83,30 @@ not $E_{t+1}=H_t-s_t Z_t$.
 
 \begin{proposition}[\BECR\ projection compressor contractivity]
 \label{prop:becr-contractivity}
-Let $C(v)=PP^\top v$ be an orthogonal projector and define the raw-gradient
-transmission operator
+Define the \BECR\ raw-gradient transmission operator
 \[
-\mathcal C_\rho(v)=C(v)+\rho(I-C)v,\qquad 0<\rho\le 1.
+\mathcal C_t^{\mathrm{BECR}}(v)=C_t(v)+\rho_t\bigl(v-C_t(v)\bigr),
+\]
+where $C_t(v)=P_tP_t^\top v$ is an orthogonal projector and
+\[
+\rho_t\in[\rho_{\min},\rho_{\max}] \subset (0,2).
+\]
+Define
+\[
+\delta=
+1-\max\{|1-\rho_{\min}|,\;|1-\rho_{\max}|\}^2.
 \]
 Then
 \[
-v-\mathcal C_\rho(v)=(1-\rho)(I-C)v
+v-\mathcal C_t^{\mathrm{BECR}}(v)=(1-\rho_t)(I-C_t)v
 \]
 and therefore
 \[
-\norm{v-\mathcal C_\rho(v)}^2
-\le (1-\rho)^2 \norm{v}^2.
+\norm{v-\mathcal C_t^{\mathrm{BECR}}(v)}^2
+\le (1-\delta)\norm{v}^2.
 \]
-In particular, $\mathcal C_\rho$ is a contractive raw-gradient compressor, and
-the residual that remains after one transmission step shrinks by the factor
-$1-\rho$ on the orthogonal complement of the current subspace.
+In particular, $\mathcal C_t^{\mathrm{BECR}}$ is a $\delta$-contractive
+raw-gradient transmission operator. When $\rho_t=1$, the operator reduces to
+identity transmission $\,\mathcal C_t^{\mathrm{BECR}}(v)=v$, which is not
+communication compression.
 \end{proposition}

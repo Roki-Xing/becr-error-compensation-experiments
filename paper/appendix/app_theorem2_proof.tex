@@ -1,8 +1,46 @@
-\textbf{Status.} TODO: integrate the full accepted clipping-repair proof.
+The $x$-recursion is unchanged from
+Theorem~\ref{thm:positive-epsilon-failure}, so the same argument yields
+geometric convergence $x_t\to 0$.
 
-\medskip
-\noindent
-The proof slot should show that $x_t$ still converges under the projected
-positive-$\epsilon$ branch and that the clipped lower bound
-$s_t\ge s_{\min}>0$ makes the orthogonal recurrence a stable contraction when
-$0<\eta b s_{\min}<2$.
+For the clipped recovery branch, define
+\[
+s_t=\operatorname{clip}\!\left(\phi(a x_t),s_{\min},s_{\max}\right),
+\qquad
+c_t=\eta b s_t.
+\]
+By construction,
+\[
+0<s_{\min}\le s_t\le s_{\max}<\frac{2}{\eta b},
+\]
+hence
+\[
+c_t\in[\eta b s_{\min},\,\eta b s_{\max}]\subset (0,2).
+\]
+The $y$-recursion is
+\[
+y_{t+1}=(1-c_t)y_t.
+\]
+Define
+\[
+q_y=\max_{c\in[\eta b s_{\min},\,\eta b s_{\max}]}|1-c|.
+\]
+Because the interval is compact and contained in $(0,2)$, we have $q_y<1$.
+Therefore
+\[
+|y_{t+1}|\le q_y |y_t|,
+\]
+and by induction
+\[
+|y_t|\le q_y^t |y_0|.
+\]
+So $y_t\to 0$ geometrically.
+
+Combining $x_t\to 0$ with $y_t\to 0$ gives
+\[
+\grad f(x_t,y_t)=(a x_t,b y_t)\to (0,0),
+\]
+and hence
+\[
+\norm{\grad f(x_t,y_t)}\to 0.
+\]
+This proves Theorem~\ref{thm:clipping-repair}.

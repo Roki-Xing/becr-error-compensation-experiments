@@ -1,14 +1,221 @@
-\textbf{Status.} TODO: integrate the accepted \BECR-SGD proof text.
+We write $\E_t[\cdot]=\E[\cdot\mid \mathcal F_t]$. The proof follows the
+classical Error-Feedback perturbed-iterate template, but is stated only for
+the constant-step \BECR-SGD abstraction in
+Theorem~\ref{thm:becr-sgd}.
 
-\medskip
-\noindent
-The proof should remain scoped to SGD and should not be rewritten as an Adam
-convergence theorem. The intended structure is:
-\begin{enumerate}[leftmargin=1.5em]
-\item define the perturbed iterate using the raw-gradient residual buffer;
-\item use Proposition~\ref{prop:becr-contractivity} to control the residual;
-\item separate the bounded transmission factor $\rho_t$ from the adaptive scale
-      $s_t$;
-\item derive the standard smooth nonconvex telescoping bound with
-      $O(T^{-1/2})$ average gradient norm.
-\end{enumerate}
+\paragraph{Step 1: residual-energy lemma.}
+Because $e_{t+1}=p_t-q_t=p_t-C_t^{\mathrm{BECR}}(p_t)$ and
+$p_t=g_t+e_t$, conditional $\delta$-contractivity gives
+\[
+\E_t\norm{e_{t+1}}^2
+\le
+(1-\delta)\norm{g_t+e_t}^2.
+\]
+Apply Young's inequality
+\[
+\norm{u+v}^2\le (1+\beta)\norm{u}^2+(1+\beta^{-1})\norm{v}^2
+\]
+with $u=e_t$, $v=g_t$, and
+\[
+\beta=\frac{\delta}{2(1-\delta)}.
+\]
+Then
+\[
+(1-\delta)(1+\beta)=1-\frac{\delta}{2},
+\qquad
+(1-\delta)(1+\beta^{-1})
+=
+\frac{(1-\delta)(2-\delta)}{\delta}.
+\]
+Therefore
+\[
+\E_t\norm{e_{t+1}}^2
+\le
+\left(1-\frac{\delta}{2}\right)\norm{e_t}^2
++
+\frac{(1-\delta)(2-\delta)}{\delta}\norm{g_t}^2.
+\]
+Taking total expectation and summing the resulting recursion yields
+\[
+\sum_{t=0}^{T-1}\E\norm{e_t}^2
+\le
+\frac{2(1-\delta)(2-\delta)}{\delta^2}
+\sum_{t=0}^{T-1}\E\norm{g_t}^2.
+\]
+Since $\E_t[g_t]=\grad f(x_t)$ and
+$\E_t\norm{g_t-\grad f(x_t)}^2\le \sigma^2$,
+\[
+\E\norm{g_t}^2
+=
+\E\norm{\grad f(x_t)}^2
++
+\E\norm{g_t-\grad f(x_t)}^2
+\le
+\E\norm{\grad f(x_t)}^2+\sigma^2.
+\]
+Hence
+\[
+\sum_{t=0}^{T-1}\E\norm{e_t}^2
+\le
+K_\delta
+\left(
+\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
++
+T\sigma^2
+\right),
+\]
+where
+\[
+K_\delta=\frac{2(1-\delta)(2-\delta)}{\delta^2}.
+\]
+
+\paragraph{Step 2: perturbed iterate.}
+Define
+\[
+\tilde x_t=x_t-\eta e_t.
+\]
+Because $\eta$ is constant and $x_{t+1}=x_t-\eta q_t$, we have
+\[
+\tilde x_{t+1}
+=
+x_{t+1}-\eta e_{t+1}
+=
+x_t-\eta q_t-\eta(p_t-q_t)
+=
+x_t-\eta(g_t+e_t)
+=
+\tilde x_t-\eta g_t.
+\]
+This identity is the reason the theorem is stated only for constant step size.
+
+\paragraph{Step 3: smoothness descent.}
+By $L$-smoothness,
+\[
+f(\tilde x_{t+1})
+\le
+f(\tilde x_t)
+-\eta \inner{\grad f(\tilde x_t)}{g_t}
++
+\frac{L\eta^2}{2}\norm{g_t}^2.
+\]
+Taking conditional expectation and using $\E_t[g_t]=\grad f(x_t)$,
+\[
+\E_t[f(\tilde x_{t+1})]
+\le
+f(\tilde x_t)
+-\eta \inner{\grad f(\tilde x_t)}{\grad f(x_t)}
++
+\frac{L\eta^2}{2}\Bigl(\norm{\grad f(x_t)}^2+\sigma^2\Bigr).
+\]
+Use
+\[
+\inner{a}{b}
+=
+\norm{b}^2+\inner{a-b}{b}
+\ge
+\frac12\norm{b}^2-\frac12\norm{a-b}^2
+\]
+with $a=\grad f(\tilde x_t)$ and $b=\grad f(x_t)$ to obtain
+\[
+\E_t[f(\tilde x_{t+1})]
+\le
+f(\tilde x_t)
+-\frac{\eta}{2}\norm{\grad f(x_t)}^2
++
+\frac{\eta}{2}\norm{\grad f(\tilde x_t)-\grad f(x_t)}^2
++
+\frac{L\eta^2}{2}\Bigl(\norm{\grad f(x_t)}^2+\sigma^2\Bigr).
+\]
+Since $f$ is $L$-smooth,
+\[
+\norm{\grad f(\tilde x_t)-\grad f(x_t)}
+\le
+L\norm{\tilde x_t-x_t}
+=
+L\eta \norm{e_t}.
+\]
+Therefore
+\[
+\E_t[f(\tilde x_{t+1})]
+\le
+f(\tilde x_t)
+-\left(\frac{\eta}{2}-\frac{L\eta^2}{2}\right)\norm{\grad f(x_t)}^2
++
+\frac{L^2\eta^3}{2}\norm{e_t}^2
++
+\frac{L\eta^2}{2}\sigma^2.
+\]
+
+\paragraph{Step 4: telescope and absorb the residual term.}
+Take total expectation, sum from $t=0$ to $T-1$, use
+$\tilde x_0=x_0-\eta e_0=x_0$, and lower-bound
+$f(\tilde x_T)\ge f_\star$. If $\eta\le 1/(2L)$, then
+\[
+\frac{\eta}{2}-\frac{L\eta^2}{2}\ge \frac{\eta}{4},
+\]
+so
+\[
+\frac{\eta}{4}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+f(x_0)-f_\star
++
+\frac{L^2\eta^3}{2}\sum_{t=0}^{T-1}\E\norm{e_t}^2
++
+\frac{L\eta^2T}{2}\sigma^2.
+\]
+Insert the residual-energy lemma:
+\[
+\frac{\eta}{4}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+f(x_0)-f_\star
++
+\frac{L^2\eta^3K_\delta}{2}
+\left(
+\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
++
+T\sigma^2
+\right)
++
+\frac{L\eta^2T}{2}\sigma^2.
+\]
+If
+\[
+\eta\le \frac{1}{2L\sqrt{K_\delta}},
+\]
+then
+\[
+\frac{L^2\eta^3K_\delta}{2}\le \frac{\eta}{8}.
+\]
+Move this term to the left-hand side to get
+\[
+\frac{\eta}{8}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+f(x_0)-f_\star
++
+\frac{L\eta^2T}{2}\sigma^2
++
+\frac{L^2\eta^3K_\delta T}{2}\sigma^2.
+\]
+Dividing by $\eta T/8$ yields
+\[
+\frac{1}{T}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+\frac{8(f(x_0)-f_\star)}{\eta T}
++
+4L\eta\sigma^2
++
+4L^2K_\delta \eta^2\sigma^2,
+\]
+which is the claimed bound.
+
+\paragraph{Step 5: constant-step consequence and variable-step remark.}
+Setting $\eta=\Theta(T^{-1/2})$ gives the standard $O(T^{-1/2})$ rate. By
+contrast, for variable step sizes,
+\[
+\tilde x_{t+1}
+=
+\tilde x_t-\eta_t g_t+(\eta_t-\eta_{t+1})e_{t+1},
+\]
+so an additional drift term appears. That regime is not covered by the present
+theorem and requires extra drift control. This completes the proof of
+Theorem~\ref{thm:becr-sgd}.

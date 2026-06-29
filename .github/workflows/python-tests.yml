@@ -18,6 +18,8 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Run unit tests
         run: python -m pytest -q
+      - name: Run paper claim checks
+        run: python paper/check_claims.py
       - name: Smoke-check moving projection artifacts
         run: python -m moving_projection_state.artifact_check --artifact-dir experiments/tier1-synthetic/moving_projection_artifacts/20260627T000000Z_p0_moving_projection_state --smoke-generate
       - name: Smoke-generate provenance artifacts

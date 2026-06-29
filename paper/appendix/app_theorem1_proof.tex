@@ -1,15 +1,84 @@
-\textbf{Status.} TODO: integrate the full accepted proof text from GPT Pro V3
-without renumbering.
-
-\medskip
-\noindent
-The main paper uses the corrected positive-$\epsilon$ theorem-regime dynamics
-implemented in \texttt{corrected\_synthetic/core.py}. The accepted diagnostic
-verifies the theorem conditions
+Set
 \[
-\eta a < 2\epsilon_a,\qquad
-\eta b M_0 \le \frac{1}{2},\qquad
-M_0 = \max_{0\le r\le a|x_0|}\frac{r}{(r+\epsilon_a)(r+\epsilon_s)}.
+z_t=|x_t|,\qquad \lambda=\eta a,\qquad \alpha=\epsilon_a.
 \]
-TODO: insert the full decay argument for $x_t$, the summability argument for
-$\phi_t$, and the nonzero limit argument for $y_t$.
+Since the $x$-update is
+\[
+x_{t+1}=x_t\left(1-\frac{\eta a}{|a x_t|+\epsilon_a}\right),
+\]
+we obtain the scalar recursion
+\[
+z_{t+1}
+=
+z_t\left|1-\frac{\lambda}{a z_t+\alpha}\right|.
+\]
+
+Consider the compact interval $[0,|x_0|]$ and define
+\[
+q=
+\max_{0\le z\le |x_0|}
+\left|1-\frac{\lambda}{a z+\alpha}\right|.
+\]
+Because $0<\lambda<2\alpha$ and $a z+\alpha\ge \alpha$, we have
+\[
+-1
+<
+1-\frac{\lambda}{a z+\alpha}
+<
+1
+\qquad\text{for every }z\in[0,|x_0|].
+\]
+The map $z\mapsto \left|1-\lambda/(a z+\alpha)\right|$ is continuous on the
+compact interval, so the maximum is attained and satisfies $q<1$. Therefore
+\[
+|x_t|=z_t\le q^t z_0=q^t|x_0|,
+\]
+which proves that $x_t\to 0$ geometrically.
+
+Next, recall
+\[
+\phi(a x_t)
+=
+\frac{|a x_t|}{(|a x_t|+\epsilon_a)(|a x_t|+\epsilon_s)}
+\le
+\frac{a|x_t|}{\epsilon_a\epsilon_s}.
+\]
+Since $\sum_t |x_t|<\infty$ by geometric decay, it follows that
+\[
+\sum_{t=0}^\infty \phi(a x_t)<\infty.
+\]
+
+Define
+\[
+c_t=\eta b\,\phi(a x_t).
+\]
+By the definition of $M_0$ and the fact that $|a x_t|\le a|x_0|$, we have
+\[
+0\le \phi(a x_t)\le M_0
+\qquad\Longrightarrow\qquad
+0\le c_t\le \eta b M_0\le \frac12.
+\]
+Because $\sum_t \phi(a x_t)<\infty$, we also have $\sum_t c_t<\infty$. For
+$0\le c_t\le 1/2$, the elementary bound $\log(1-c_t)\ge -2c_t$ shows that the
+series $\sum_t \log(1-c_t)$ converges to a finite value, so the infinite
+product
+\[
+\prod_{t=0}^\infty (1-c_t)
+\]
+converges to a strictly positive limit.
+
+The $y$-recursion can be written exactly as
+\[
+y_t
+=
+y_0\prod_{k=0}^{t-1}(1-c_k).
+\]
+Since $y_0\neq 0$ and the product converges to a positive limit, there exists
+$y_\infty\neq 0$ such that $y_t\to y_\infty$.
+
+Finally,
+\[
+\grad f(x_t,y_t)=(a x_t,b y_t)\to (0,b y_\infty).
+\]
+Because $b>0$ and $y_\infty\neq 0$, the gradient norm does not converge to
+zero. This proves Theorem~\ref{thm:positive-epsilon-failure}.

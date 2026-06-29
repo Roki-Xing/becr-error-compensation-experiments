@@ -11,8 +11,8 @@ regime,
 \[
 R_t = a x_t,\qquad
 \psi_t(R_t)=\frac{R_t}{|R_t|+\epsilon_a},\qquad
-\phi_t = \frac{|\psi_t(R_t)|}{|R_t|+\epsilon_s}
-= \frac{|a x_t|}{(|a x_t|+\epsilon_a)(|a x_t|+\epsilon_s)},
+\phi(r)=\frac{|r|}{(|r|+\epsilon_a)(|r|+\epsilon_s)},\qquad
+\phi_t = \phi(a x_t),
 \]
 the updates are
 \[
@@ -23,19 +23,23 @@ y_{t+1}=y_t-\eta \phi_t b y_t.
 
 \begin{theorem}[Positive-$\epsilon$ scalar recovery can leave a nonzero orthogonal gradient]
 \label{thm:positive-epsilon-failure}
-Consider the dynamics above with $0<\eta a<2\epsilon_a$ and
+Consider the dynamics above with $x_0\neq 0$, $y_0\neq 0$,
+$0<\eta a<2\epsilon_a$, and
 \[
 M_0 = \max_{0\le r\le a|x_0|}\frac{r}{(r+\epsilon_a)(r+\epsilon_s)},
 \qquad
 \eta b M_0 \le \frac{1}{2}.
 \]
-Then there exists a nonempty set of initial conditions for which
+Then
 \[
-x_t \to 0,\qquad \sum_{t=0}^\infty \phi_t < \infty,
+x_t \to 0 \text{ geometrically},\qquad
+\sum_{t=0}^\infty \phi(a x_t) < \infty,
 \]
 while
 \[
-y_t \to y_\infty \neq 0,\qquad \norm{\grad f(x_t,y_t)} \to b|y_\infty| > 0.
+y_t \to y_\infty \neq 0,\qquad
+\grad f(x_t,y_t)\to (0,b y_\infty),\qquad
+\norm{\grad f(x_t,y_t)} \not\to 0.
 \]
 \end{theorem}
 
