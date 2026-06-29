@@ -1,0 +1,5 @@
+{
+  "claim_implication": "No LDAdam comparison claim is made in corrected synthetic evidence.",
+  "included": false,
+  "reason": "Not included in P1 because matched synthetic state-compensation semantics and memory assumptions would require a separate audited baseline."
+}

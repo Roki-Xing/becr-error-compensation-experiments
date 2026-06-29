@@ -1,0 +1,31 @@
+{
+  "aggregate_id": "p1_corrected_synthetic_paper_fix_theorem_regime_aggregate",
+  "aggregate_manifest_path": "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/aggregates/p1_corrected_synthetic_paper_fix_theorem_regime_aggregate/aggregate_manifest.json",
+  "candidate_level": "main-candidate",
+  "code_commit": "ac56a7c18afd4d91e2b63feeac9de4a14571cc82",
+  "config_hashes": [
+    "990cd5c7241ac843ecbf247e3c33916e5bc88c0c30af03201ef9e7068b0e490c"
+  ],
+  "figure_candidate_level": "main-candidate",
+  "main_or_appendix_recommendation": "main-candidate",
+  "noise_hashes": [
+    null
+  ],
+  "source_manifest_paths": [
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_proj_baseline_seed000_20260628T143328Z_ac56a7c_990cd5c7/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_raw_seed000_20260628T143328Z_ac56a7c_990cd5c7/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_fira_clipped_seed000_20260628T143328Z_ac56a7c_990cd5c7/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_becr_seed000_20260628T143329Z_ac56a7c_990cd5c7/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_rho_no_lower_bound_seed000_20260628T143329Z_ac56a7c_990cd5c7/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/theorem_regime/runs/p1_corrected_synthetic_reruns_theorem_regime_coupled_unbounded_seed000_20260628T143329Z_ac56a7c_990cd5c7/manifest.json"
+  ],
+  "source_run_ids": [
+    "p1_corrected_synthetic_reruns_theorem_regime_proj_baseline_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+    "p1_corrected_synthetic_reruns_theorem_regime_fira_raw_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+    "p1_corrected_synthetic_reruns_theorem_regime_fira_clipped_seed000_20260628T143328Z_ac56a7c_990cd5c7",
+    "p1_corrected_synthetic_reruns_theorem_regime_becr_seed000_20260628T143329Z_ac56a7c_990cd5c7",
+    "p1_corrected_synthetic_reruns_theorem_regime_rho_no_lower_bound_seed000_20260628T143329Z_ac56a7c_990cd5c7",
+    "p1_corrected_synthetic_reruns_theorem_regime_coupled_unbounded_seed000_20260628T143329Z_ac56a7c_990cd5c7"
+  ],
+  "title": "Corrected theorem-regime 2D validation"
+}

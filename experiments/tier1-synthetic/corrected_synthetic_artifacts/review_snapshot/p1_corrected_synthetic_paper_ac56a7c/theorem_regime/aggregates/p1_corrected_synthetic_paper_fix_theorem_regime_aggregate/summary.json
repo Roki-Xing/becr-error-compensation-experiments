@@ -1,0 +1,16 @@
+{
+  "aggregate_id": "p1_corrected_synthetic_paper_fix_theorem_regime_aggregate",
+  "fairness": {
+    "weight_decay_semantics_match": true
+  },
+  "legacy_results_used": false,
+  "methods": [
+    "proj_baseline",
+    "fira_raw",
+    "fira_clipped",
+    "becr",
+    "rho_no_lower_bound",
+    "coupled_unbounded"
+  ],
+  "old_results_used": false
+}

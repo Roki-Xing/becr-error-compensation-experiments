@@ -1,0 +1,203 @@
+{
+  "aggregate_id": "p1_corrected_synthetic_paper_fix_anisotropic_noise_aggregate",
+  "claim_summary": {
+    "becr_beats_clipped_on_grad_norm_mean": true,
+    "becr_beats_projected_baseline_on_grad_norm_mean": true,
+    "becr_beats_raw_on_grad_norm_mean": true,
+    "statement": "In this anisotropic synthetic setting, BECR improves over clipped/raw and also beats the projected baseline on mean final gradient norm."
+  },
+  "experiment_name": "anisotropic_noise",
+  "methods": {
+    "becr": {
+      "count": 5,
+      "grad_norm_ci_high": 0.1842114542916284,
+      "grad_norm_ci_low": 0.14660564735781637,
+      "grad_norm_mean": 0.1654085508247224,
+      "grad_par_norm_mean": 0.12529614688259455,
+      "grad_perp_norm_mean": 0.10166913479101518,
+      "label": "becr",
+      "phi_raw_p95_values": [
+        17.77525403171815,
+        18.588091848423115,
+        16.865267766895485,
+        17.444069925391776,
+        17.254539447793334
+      ],
+      "residual_norm_mean": 0.09940732474144523
+    },
+    "coupled_unbounded": {
+      "count": 5,
+      "grad_norm_ci_high": 64.9965308527865,
+      "grad_norm_ci_low": 37.0823196060069,
+      "grad_norm_mean": 51.039425229396706,
+      "grad_par_norm_mean": 40.7453492410607,
+      "grad_perp_norm_mean": 14.325158369005823,
+      "label": "coupled_unbounded",
+      "phi_raw_p95_values": [
+        1.978251535078643,
+        1.798852755023654,
+        1.7591400569403044,
+        1.9747488326178035,
+        2.7750459457936087
+      ],
+      "residual_norm_mean": 11.023217749154616
+    },
+    "fira_clipped": {
+      "count": 5,
+      "grad_norm_ci_high": 2.9611904682162424,
+      "grad_norm_ci_low": 1.169009269146859,
+      "grad_norm_mean": 2.0650998686815507,
+      "grad_par_norm_mean": 0.2220468503558896,
+      "grad_perp_norm_mean": 1.9741087195826825,
+      "label": "fira_clipped",
+      "phi_raw_p95_values": [
+        13.555778679008943,
+        13.188364948956629,
+        12.352832758887757,
+        12.94219101431559,
+        13.056964867579454
+      ],
+      "residual_norm_mean": 0.0
+    },
+    "fira_raw": {
+      "count": 5,
+      "grad_norm_ci_high": 2.446685034569742,
+      "grad_norm_ci_low": 1.7635000130470708,
+      "grad_norm_mean": 2.1050925238084064,
+      "grad_par_norm_mean": 0.5559672232578748,
+      "grad_perp_norm_mean": 1.702496689843553,
+      "label": "fira_raw",
+      "phi_raw_p95_values": [
+        12.983053299323199,
+        12.97376230117124,
+        11.671044305086134,
+        12.937546586821629,
+        11.988716231626906
+      ],
+      "residual_norm_mean": 0.0
+    },
+    "proj_baseline": {
+      "count": 5,
+      "grad_norm_ci_high": 0.17461658886891873,
+      "grad_norm_ci_low": 0.1584192705203339,
+      "grad_norm_mean": 0.1665179296946263,
+      "grad_par_norm_mean": 0.12868176501456896,
+      "grad_perp_norm_mean": 0.13805956010082196,
+      "label": "proj_baseline",
+      "phi_raw_p95_values": [
+        16.993584026823882,
+        15.808402628529336,
+        14.531063484536501,
+        16.941990048645096,
+        15.512835949794725
+      ],
+      "residual_norm_mean": 0.0
+    },
+    "rho_no_lower_bound": {
+      "count": 5,
+      "grad_norm_ci_high": 2.174951438755994,
+      "grad_norm_ci_low": 1.0805825614907438,
+      "grad_norm_mean": 1.6277670001233688,
+      "grad_par_norm_mean": 0.15986624643724978,
+      "grad_perp_norm_mean": 1.3634111589618123,
+      "label": "rho_no_lower_bound",
+      "phi_raw_p95_values": [
+        13.139024824418305,
+        13.19944847327818,
+        13.008460732197825,
+        14.367658874021375,
+        14.127134492496225
+      ],
+      "residual_norm_mean": 0.0
+    }
+  },
+  "paired_differences": {
+    "becr_minus_clipped": [
+      -2.1185823510687514,
+      -2.49943077112307,
+      -1.0834861190375915,
+      -0.6634433106989768,
+      -3.1335140373557513
+    ],
+    "becr_minus_proj_baseline": [
+      -0.035439774486632325,
+      -0.002563946428658481,
+      0.017099362185306277,
+      -0.019935304498355122,
+      0.03529276887882005
+    ],
+    "becr_minus_raw": [
+      -1.8467788372624907,
+      -1.5907951947943089,
+      -1.659653025061109,
+      -2.066988495706806,
+      -2.534204312093707
+    ]
+  },
+  "paper_quality": true,
+  "seed_count": 5,
+  "source_manifest_paths": [
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed000_20260628T143520Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed000_20260628T143521Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed000_20260628T143521Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed000_20260628T143522Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed000_20260628T143523Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed000_20260628T143523Z_ac56a7c_138da036/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed001_20260628T143524Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed001_20260628T143525Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed001_20260628T143525Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed001_20260628T143526Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed001_20260628T143527Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed001_20260628T143527Z_ac56a7c_d0768a68/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed002_20260628T143528Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed002_20260628T143528Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed002_20260628T143529Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed002_20260628T143530Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed002_20260628T143530Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed002_20260628T143531Z_ac56a7c_4feac933/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed003_20260628T143531Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed003_20260628T143532Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed003_20260628T143533Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed003_20260628T143533Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed003_20260628T143534Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed003_20260628T143535Z_ac56a7c_745029f4/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed004_20260628T143535Z_ac56a7c_6dd98d72/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed004_20260628T143536Z_ac56a7c_6dd98d72/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed004_20260628T143536Z_ac56a7c_6dd98d72/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed004_20260628T143537Z_ac56a7c_6dd98d72/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed004_20260628T143538Z_ac56a7c_6dd98d72/manifest.json",
+    "/tmp/becr_p1_corrected_synthetic_fix/p1_corrected_synthetic_paper_fix/anisotropic_noise/runs/p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed004_20260628T143538Z_ac56a7c_6dd98d72/manifest.json"
+  ],
+  "source_run_ids": [
+    "p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed000_20260628T143520Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed000_20260628T143521Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed000_20260628T143521Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed000_20260628T143522Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed000_20260628T143523Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed000_20260628T143523Z_ac56a7c_138da036",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed001_20260628T143524Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed001_20260628T143525Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed001_20260628T143525Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed001_20260628T143526Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed001_20260628T143527Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed001_20260628T143527Z_ac56a7c_d0768a68",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed002_20260628T143528Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed002_20260628T143528Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed002_20260628T143529Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed002_20260628T143530Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed002_20260628T143530Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed002_20260628T143531Z_ac56a7c_4feac933",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed003_20260628T143531Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed003_20260628T143532Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed003_20260628T143533Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed003_20260628T143533Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed003_20260628T143534Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed003_20260628T143535Z_ac56a7c_745029f4",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_proj_baseline_seed004_20260628T143535Z_ac56a7c_6dd98d72",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_raw_seed004_20260628T143536Z_ac56a7c_6dd98d72",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_fira_clipped_seed004_20260628T143536Z_ac56a7c_6dd98d72",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_becr_seed004_20260628T143537Z_ac56a7c_6dd98d72",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_rho_no_lower_bound_seed004_20260628T143538Z_ac56a7c_6dd98d72",
+    "p1_corrected_synthetic_reruns_anisotropic_noise_coupled_unbounded_seed004_20260628T143538Z_ac56a7c_6dd98d72"
+  ]
+}
