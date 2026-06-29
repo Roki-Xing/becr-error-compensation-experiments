@@ -7,5 +7,6 @@
 *.out
 *.synctex.gz
 *.toc
-build/
+build/*
+!build/.gitkeep
 main.pdf
