@@ -14,12 +14,18 @@ $g_t$ satisfy
 \E[g_t\mid \mathcal F_t]=\grad f(x_t),\qquad
 \E\!\left[\norm{g_t-\grad f(x_t)}^2\mid \mathcal F_t\right]\le \sigma^2.
 \]
-Let $C_t^{\mathrm{BECR}}$ be conditionally $\delta$-contractive in the sense
-that, for every $\mathcal F_t$-measurable vector $v$,
+After drawing $g_t$, define the enlarged sigma-field
 \[
-\E\!\left[\norm{v-C_t^{\mathrm{BECR}}(v)}^2\mid \mathcal F_t\right]
-\le (1-\delta)\norm{v}^2,
-\qquad \delta\in(0,1].
+\mathcal G_t=\sigma(\mathcal F_t,g_t).
+\]
+Assume any compressor randomness used by $C_t^{\mathrm{BECR}}$ is conditionally
+independent after $\mathcal G_t$, and let $C_t^{\mathrm{BECR}}$ be
+conditionally $\delta$-contractive in the sense that, for every
+square-integrable $\mathcal G_t$-measurable vector $v_t$,
+\[
+\E\!\left[\norm{v_t-C_t^{\mathrm{BECR}}(v_t)}^2\mid \mathcal G_t\right]
+\le (1-\delta)\norm{v_t}^2,
+\qquad \delta\in(0,1).
 \]
 Assume $e_0=0$, let $\eta>0$ be constant, and define
 \[
@@ -28,11 +34,11 @@ q_t=C_t^{\mathrm{BECR}}(p_t),\qquad
 e_{t+1}=p_t-q_t,\qquad
 x_{t+1}=x_t-\eta q_t.
 \]
-Set
+Then $p_t=g_t+e_t$ is $\mathcal G_t$-measurable. Set
 \[
 K_\delta=\frac{2(1-\delta)(2-\delta)}{\delta^2},
 \]
-and assume
+which is well-defined and strictly positive because $\delta\in(0,1)$. Assume
 \[
 \eta\le \frac{1}{2L},
 \qquad
@@ -55,8 +61,13 @@ $O(T^{-1/2})$ rate for the average squared gradient norm.
 The scope of Theorem~\ref{thm:becr-sgd} is intentionally narrow. It is a
 constant-step SGD abstraction of raw-gradient residual transmission; it is not
 an Adam convergence theorem, does not compensate compressed Adam optimizer
-states, and does not subsume LDAdam-style generalized Error Feedback. For
-variable step sizes, the perturbed iterate satisfies
+states, and does not subsume LDAdam-style generalized Error Feedback. The
+identity case $\delta=1$ is excluded from the residual-energy proof only to
+avoid the degenerate $K_\delta=0$ division. In that case,
+$C_t^{\mathrm{BECR}}(v)=v$ almost surely, $e_t=0$ for all $t$ when $e_0=0$,
+and the method reduces to standard SGD; the standard SGD bound applies. This
+is also the case where \BECR\ transmits the dense complement exactly and is not
+compression. For variable step sizes, the perturbed iterate satisfies
 \[
 \tilde x_{t+1}
 =

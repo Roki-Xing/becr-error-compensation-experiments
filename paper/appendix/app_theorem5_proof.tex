@@ -1,13 +1,23 @@
-We write $\E_t[\cdot]=\E[\cdot\mid \mathcal F_t]$. The proof follows the
+Let $\mathcal F_t$ contain all randomness up to $x_t$, $e_t$, and any past
+compressor or projection states before sampling $g_t$. After drawing the
+stochastic gradient, define the enlarged sigma-field
+\[
+\mathcal G_t=\sigma(\mathcal F_t,g_t).
+\]
+Then $p_t=g_t+e_t$ is $\mathcal G_t$-measurable. The proof follows the
 classical Error-Feedback perturbed-iterate template, but is stated only for
 the constant-step \BECR-SGD abstraction in
-Theorem~\ref{thm:becr-sgd}.
+Theorem~\ref{thm:becr-sgd}. In this residual-energy proof we assume
+\[
+\delta\in(0,1).
+\]
 
 \paragraph{Step 1: residual-energy lemma.}
 Because $e_{t+1}=p_t-q_t=p_t-C_t^{\mathrm{BECR}}(p_t)$ and
-$p_t=g_t+e_t$, conditional $\delta$-contractivity gives
+$p_t=g_t+e_t$ is $\mathcal G_t$-measurable, conditional $\delta$-contractivity
+gives
 \[
-\E_t\norm{e_{t+1}}^2
+\E\!\left[\norm{e_{t+1}}^2\mid \mathcal G_t\right]
 \le
 (1-\delta)\norm{g_t+e_t}^2.
 \]
@@ -29,7 +39,7 @@ Then
 \]
 Therefore
 \[
-\E_t\norm{e_{t+1}}^2
+\E\!\left[\norm{e_{t+1}}^2\mid \mathcal G_t\right]
 \le
 \left(1-\frac{\delta}{2}\right)\norm{e_t}^2
 +
@@ -42,8 +52,11 @@ Taking total expectation and summing the resulting recursion yields
 \frac{2(1-\delta)(2-\delta)}{\delta^2}
 \sum_{t=0}^{T-1}\E\norm{g_t}^2.
 \]
-Since $\E_t[g_t]=\grad f(x_t)$ and
-$\E_t\norm{g_t-\grad f(x_t)}^2\le \sigma^2$,
+Since $\E[g_t\mid\mathcal F_t]=\grad f(x_t)$ and
+\[
+\E\!\left[\norm{g_t-\grad f(x_t)}^2\mid\mathcal F_t\right]\le \sigma^2,
+\]
+we have
 \[
 \E\norm{g_t}^2
 =
@@ -98,9 +111,10 @@ f(\tilde x_t)
 +
 \frac{L\eta^2}{2}\norm{g_t}^2.
 \]
-Taking conditional expectation and using $\E_t[g_t]=\grad f(x_t)$,
+Taking conditional expectation with respect to $\mathcal F_t$ and using
+$\E[g_t\mid\mathcal F_t]=\grad f(x_t)$,
 \[
-\E_t[f(\tilde x_{t+1})]
+\E\!\left[f(\tilde x_{t+1})\mid\mathcal F_t\right]
 \le
 f(\tilde x_t)
 -\eta \inner{\grad f(\tilde x_t)}{\grad f(x_t)}
@@ -117,7 +131,7 @@ Use
 \]
 with $a=\grad f(\tilde x_t)$ and $b=\grad f(x_t)$ to obtain
 \[
-\E_t[f(\tilde x_{t+1})]
+\E\!\left[f(\tilde x_{t+1})\mid\mathcal F_t\right]
 \le
 f(\tilde x_t)
 -\frac{\eta}{2}\norm{\grad f(x_t)}^2
@@ -136,7 +150,7 @@ L\eta \norm{e_t}.
 \]
 Therefore
 \[
-\E_t[f(\tilde x_{t+1})]
+\E\!\left[f(\tilde x_{t+1})\mid\mathcal F_t\right]
 \le
 f(\tilde x_t)
 -\left(\frac{\eta}{2}-\frac{L\eta^2}{2}\right)\norm{\grad f(x_t)}^2
@@ -209,8 +223,28 @@ Dividing by $\eta T/8$ yields
 which is the claimed bound.
 
 \paragraph{Step 5: constant-step consequence and variable-step remark.}
-Setting $\eta=\Theta(T^{-1/2})$ gives the standard $O(T^{-1/2})$ rate. By
-contrast, for variable step sizes,
+Setting $\eta=\Theta(T^{-1/2})$ gives the standard $O(T^{-1/2})$ rate.
+
+\paragraph{Identity case $\delta=1$.}
+If $\delta=1$, then the contractivity condition implies
+\[
+\E\!\left[\norm{C_t^{\mathrm{BECR}}(v_t)-v_t}^2\mid \mathcal G_t\right]=0
+\]
+for every square-integrable $\mathcal G_t$-measurable $v_t$. Hence
+$C_t^{\mathrm{BECR}}(v_t)=v_t$ almost surely. In particular, $q_t=p_t$
+almost surely, so
+\[
+e_{t+1}=p_t-q_t=0.
+\]
+With $e_0=0$, induction gives $e_t=0$ for all $t$, and the update becomes
+\[
+x_{t+1}=x_t-\eta g_t.
+\]
+This is exactly standard SGD, so the standard SGD bound applies. This
+identity-transmission case is not part of the residual-energy argument above.
+
+\paragraph{Variable-step remark.}
+By contrast, for variable step sizes,
 \[
 \tilde x_{t+1}
 =

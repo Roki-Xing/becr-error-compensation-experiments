@@ -1,6 +1,6 @@
 Set
 \[
-z_t=|x_t|,\qquad \lambda=\eta a,\qquad \alpha=\epsilon_a.
+z_t=|x_t|,\qquad z_0=|x_0|,\qquad \lambda=\eta a,\qquad \alpha=\epsilon_a.
 \]
 Since the $x$-update is
 \[
@@ -13,25 +13,39 @@ z_{t+1}
 z_t\left|1-\frac{\lambda}{a z_t+\alpha}\right|.
 \]
 
-Consider the compact interval $[0,|x_0|]$ and define
+Define
+\[
+h(z)=\left|1-\frac{\lambda}{a z+\alpha}\right|
+\]
+and consider the compact interval $[0,z_0]$. Define
 \[
 q=
-\max_{0\le z\le |x_0|}
-\left|1-\frac{\lambda}{a z+\alpha}\right|.
+\max_{0\le z\le z_0} h(z).
 \]
 Because $0<\lambda<2\alpha$ and $a z+\alpha\ge \alpha$, we have
 \[
 -1
 <
 1-\frac{\lambda}{a z+\alpha}
-<
+< 
 1
-\qquad\text{for every }z\in[0,|x_0|].
+\qquad\text{for every }z\in[0,z_0].
 \]
-The map $z\mapsto \left|1-\lambda/(a z+\alpha)\right|$ is continuous on the
+The map $z\mapsto h(z)$ is continuous on the
 compact interval, so the maximum is attained and satisfies $q<1$. Therefore
 \[
-|x_t|=z_t\le q^t z_0=q^t|x_0|,
+z_0\in[0,z_0].
+\]
+We now prove by induction that $z_t$ remains in the invariant interval
+$[0,z_0]$. The base case is immediate. For the induction step, assume
+$z_t\le z_0$. Then $z_t\in[0,z_0]$, so
+\[
+z_{t+1}=z_t h(z_t)\le q z_t\le z_t\le z_0.
+\]
+Thus $z_{t+1}\in[0,z_0]$, which closes the induction. Since
+$z_{t+1}\le q z_t$ at every step, another induction gives
+\[
+z_t\le q^t z_0=q^t|x_0|,
 \]
 which proves that $x_t\to 0$ geometrically.
 
