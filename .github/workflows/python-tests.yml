@@ -18,6 +18,8 @@ jobs:
           pip install -r requirements-dev.txt
       - name: Run unit tests
         run: python -m pytest -q
+      - name: Run paper bibliography checks
+        run: python paper/check_bib.py
       - name: Run paper claim checks
         run: python paper/check_claims.py
       - name: Smoke-check moving projection artifacts
