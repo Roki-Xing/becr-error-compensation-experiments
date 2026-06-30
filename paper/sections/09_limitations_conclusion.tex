@@ -1,0 +1,29 @@
+\section{Limitations}
+
+This draft has several deliberate boundaries. First, we do not prove that
+original \Fira generally fails, and we do not prove that exact \Fira generally
+converges. The exact-Fira parity harness in this repository validates only a
+read-only oracle on tested small fixtures. Second, Theorem~\ref{thm:becr-sgd}
+is an SGD abstraction, not an Adam convergence theorem. Third, we do not
+include neural diagnostics: CIFAR, MNIST, WikiText, and TinyGPT remain blocked
+and are not used as evidence here.
+
+Fourth, the memory accounting in this paper is synthetic and CPU only. The
+artifact schema records residual bytes, projection bytes, and optimizer-state
+bytes, but we do not validate GPU peak memory or claim memory-neutrality.
+Fifth, LDAdam is treated as the closest related prior art, but we do not offer
+an empirical LDAdam comparison in this draft. Finally, the corrected synthetic
+evidence shows that clipping already repairs the fixed-stale orthogonal channel;
+\BECR\ should therefore be read as a residualized repair mechanism, not as a
+universal improvement over clipping.
+
+\section{Conclusion}
+
+The main message is narrow and testable: \Fira-style norm recovery is not Error
+Feedback. In stale-subspace regimes, positive-$\epsilon$ recovery can send only
+finite cumulative mass through the discarded branch and leave a nonzero
+orthogonal gradient. Lower-bounded recovery and separated raw-gradient residual
+transmission repair that failure in controlled diagnostics. The resulting
+package supports a theory/mechanism paper centered on recovery-branch behavior,
+while explicitly leaving neural validation, Adam convergence, and broader
+optimizer comparisons for later work.

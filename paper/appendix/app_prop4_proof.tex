@@ -1,0 +1,45 @@
+By definition,
+\[
+\mathcal C_t^{\mathrm{BECR}}(v)=C_t(v)+\rho_t\bigl(v-C_t(v)\bigr).
+\]
+For the orthogonal projector $C_t(v)=P_tP_t^\top v$, we have
+$C_t^2=C_t$ and $I-C_t$ is the orthogonal projector onto the complement of the
+current subspace. Therefore
+\[
+v-\mathcal C_t^{\mathrm{BECR}}(v)
+=
+v-C_t(v)-\rho_t\bigl(v-C_t(v)\bigr)
+=
+(1-\rho_t)(I-C_t)v.
+\]
+Taking norms gives
+\[
+\norm{v-\mathcal C_t^{\mathrm{BECR}}(v)}^2
+=
+|1-\rho_t|^2 \norm{(I-C_t)v}^2
+\le
+|1-\rho_t|^2 \norm{v}^2.
+\]
+Since $\rho_t\in[\rho_{\min},\rho_{\max}]$, we have
+\[
+|1-\rho_t|^2
+\le
+\max\{|1-\rho_{\min}|,\;|1-\rho_{\max}|\}^2
+=
+1-\delta.
+\]
+Hence
+\[
+\norm{v-\mathcal C_t^{\mathrm{BECR}}(v)}^2
+\le
+(1-\delta)\norm{v}^2,
+\]
+which is exactly the claimed $\delta$-contractivity.
+
+Finally, if $\rho_t=1$ then
+\[
+\mathcal C_t^{\mathrm{BECR}}(v)=C_t(v)+v-C_t(v)=v.
+\]
+So $\rho_t=1$ corresponds to identity transmission of the raw vector and
+should not be interpreted as communication compression. This proves
+Proposition~\ref{prop:becr-contractivity}.

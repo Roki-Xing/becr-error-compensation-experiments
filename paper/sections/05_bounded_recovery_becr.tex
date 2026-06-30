@@ -1,0 +1,112 @@
+\section{Bounded Recovery and \BECR}
+
+Two repairs follow naturally from Theorem~\ref{thm:positive-epsilon-failure}.
+The first keeps the recovery branch but lower-bounds its applied scale. The
+second adds a residual state in raw-gradient units and separates raw
+transmission from adaptive preconditioning.
+
+\begin{theorem}[Lower-bounded clipping repairs the $2$D failure]
+\label{thm:clipping-repair}
+Under the same quadratic and stale projector as in
+Theorem~\ref{thm:positive-epsilon-failure}, define
+\[
+s_t = \operatorname{clip}\!\left(\phi_t, s_{\min}, s_{\max}\right),
+\qquad
+0<s_{\min}\le s_{\max}<\frac{2}{\eta b},
+\]
+and update
+\[
+x_{t+1}=x_t-\eta \frac{a x_t}{|a x_t|+\epsilon_a},
+\qquad
+y_{t+1}=y_t-\eta s_t b y_t.
+\]
+If $0<\eta a<2\epsilon_a$, then
+\[
+x_t\to 0,\qquad y_t\to 0,\qquad \norm{\grad f(x_t,y_t)}\to 0.
+\]
+\end{theorem}
+
+Clipping does not reconstruct adaptive moments for the orthogonal branch. It is
+best understood as a diagnostic repair: once the applied recovery scale is kept
+strictly positive, the orthogonal stale channel can no longer vanish by scale
+collapse alone.
+
+\begin{theorem}[Separated $\rho/s$ \BECR\ repairs the $2$D failure]
+\label{thm:becr-repair}
+Under the same $x$-update as in
+Theorem~\ref{thm:positive-epsilon-failure}, define
+\[
+h_t = b y_t + e_t,\qquad
+z_t = \rho h_t,\qquad
+e_{t+1} = h_t - z_t,\qquad
+y_{t+1} = y_t - \eta s_t z_t,
+\]
+with
+\[
+s_t = \operatorname{clip}\!\left(\phi(a x_t), s_{\min}, s_{\max}\right).
+\]
+Assume
+\[
+0 < \eta a < 2\epsilon_a,\qquad
+s_{\min}>0,\qquad
+0 < \rho < \frac{4}{2+\eta b s_{\min}}.
+\]
+Then
+\[
+x_t \to 0,\qquad (y_t,e_t)\to(0,0),\qquad \norm{\grad f(x_t,y_t)}\to 0.
+\]
+The $(y_t,e_t)$ subsystem is governed by
+\[
+A=
+\begin{bmatrix}
+1-\eta b \rho s_{\min} & -\eta \rho s_{\min} \\
+b(1-\rho) & 1-\rho
+\end{bmatrix},
+\]
+whose characteristic polynomial is
+\[
+\lambda^2 - \bigl(2-\rho(1+\eta b s_{\min})\bigr)\lambda + (1-\rho),
+\]
+and the Jury/Schur condition is precisely
+\[
+0 < \rho < \frac{4}{2+\eta b s_{\min}}.
+\]
+\end{theorem}
+
+The separation is crucial. $h_t$, $z_t$, and $e_t$ live in raw-gradient units;
+$s_t$ preconditions only the transmitted raw signal in the parameter update.
+The residual update is therefore
+\[
+E_{t+1}=H_t-Z_t^{\mathrm{eff}},
+\]
+not $E_{t+1}=H_t-s_t Z_t$.
+
+\begin{proposition}[\BECR\ projection compressor contractivity]
+\label{prop:becr-contractivity}
+Define the \BECR\ raw-gradient transmission operator
+\[
+\mathcal C_t^{\mathrm{BECR}}(v)=C_t(v)+\rho_t\bigl(v-C_t(v)\bigr),
+\]
+where $C_t(v)=P_tP_t^\top v$ is an orthogonal projector and
+\[
+\rho_t\in[\rho_{\min},\rho_{\max}] \subset (0,2).
+\]
+Define
+\[
+\delta=
+1-\max\{|1-\rho_{\min}|,\;|1-\rho_{\max}|\}^2.
+\]
+Then
+\[
+v-\mathcal C_t^{\mathrm{BECR}}(v)=(1-\rho_t)(I-C_t)v
+\]
+and therefore
+\[
+\norm{v-\mathcal C_t^{\mathrm{BECR}}(v)}^2
+\le (1-\delta)\norm{v}^2.
+\]
+In particular, $\mathcal C_t^{\mathrm{BECR}}$ is a $\delta$-contractive
+raw-gradient transmission operator. When $\rho_t=1$, the operator reduces to
+identity transmission $\,\mathcal C_t^{\mathrm{BECR}}(v)=v$, which is not
+communication compression.
+\end{proposition}

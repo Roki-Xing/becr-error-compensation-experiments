@@ -1,0 +1,16 @@
+The repository contains a parity-validated exact-Fira harness under
+\texttt{fira\_parity/}. Its accepted summary for the tested fixture is:
+\begin{itemize}
+\item fixture ID:
+\texttt{shape\_2x1\_rank1\_gap1\_fp64};
+\item method class:
+\texttt{official\_fira\_oracle\_fixture};
+\item first mismatch: none;
+\item oracle and candidate final gradient norm:
+$0.7495593870109786$;
+\item largest recorded field errors: on the order of $10^{-15}$.
+\end{itemize}
+
+This appendix note is intentionally narrow. It does not certify all official
+\Fira code paths, and the main paper does not use the fixture to claim broad
+official-\Fira convergence or failure.

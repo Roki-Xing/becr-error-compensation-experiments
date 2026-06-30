@@ -1,0 +1,17 @@
+\centering
+\scriptsize
+\begin{tabularx}{\linewidth}{p{1.8cm}p{2.8cm}p{2.6cm}X}
+\toprule
+Method & Main mechanism & Proven guarantee & Boundary to this work \\
+\midrule
+Fira & Full-rank recovery by norm scaling from a low-rank adaptive branch & No general stochastic nonconvex convergence theorem in the main paper & Closest recovery-branch ancestor; our negative result targets this mechanism, not all official code paths \\
+GaLore & Low-rank projected updates & Projected/subspace optimization perspective & No full-rank recovery branch \\
+GoLore & Random projection to avoid SVD noise bias & Stochastic convergence for randomized low-rank projection & Closest noisy-subspace counterexample template \\
+LDAdam & Projection-aware Adam states with generalized EF & Nonconvex convergence for low-dimensional Adam states & Closest novelty risk; our work does not subsume compressed Adam-state compensation \\
+MicroAdam & Low-dimensional adaptive state reduction & Placeholder reference & Related compressed-state family only \\
+GreedyLore & Greedy low-rank selection & Placeholder reference & Related subspace-selection family only \\
+SubTrack++ & Grassmannian tracking with Fira-like recovery & Tracking-oriented analysis under restrictive assumptions & Shares recovery-scaling intuition but not our stale-branch repair theorem \\
+Classical EF-SGD & Residual accumulation of compression error & Standard compressed-SGD convergence & Defines the residual mechanism that norm recovery is not \\
+This work & Recovery-branch diagnosis, lower-bounded repair, raw-gradient residual transmission & $2$D repair theorems and an SGD abstraction & Theory/mechanism scope only; no Adam convergence or neural validation claim \\
+\bottomrule
+\end{tabularx}

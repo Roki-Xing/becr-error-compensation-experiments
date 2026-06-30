@@ -1,0 +1,14 @@
+\centering
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Method & final $x$ & final $y$ & final $\|\grad f\|$ & $\sum \phi_{\mathrm{raw}}$ & $\sum s_{\mathrm{applied}}$ & residual \\
+\midrule
+Projected baseline & $1.36{\times}10^{-180}$ & $1.0$ & $1.0$ & $1.318$ & $0$ & $0$ \\
+Raw recovery & $1.36{\times}10^{-180}$ & $0.5$ & $0.5$ & $1.318$ & $1.318$ & $0$ \\
+Clipped recovery & $1.36{\times}10^{-180}$ & $3.28{\times}10^{-28}$ & $3.28{\times}10^{-28}$ & $1.318$ & $1.20{\times}10^2$ & $0$ \\
+\BECR & $1.36{\times}10^{-180}$ & $1.77{\times}10^{-32}$ & $1.77{\times}10^{-32}$ & $1.318$ & $1.20{\times}10^2$ & $2.29{\times}10^{-32}$ \\
+No-lower $\rho$ & $1.36{\times}10^{-180}$ & $0.6717$ & $0.6717$ & $1.318$ & $1.20{\times}10^2$ & $4.01{\times}10^2$ \\
+Coupled $\rho=\phi$ & $1.36{\times}10^{-180}$ & $0.6717$ & $0.6717$ & $1.318$ & $1.20{\times}10^2$ & $4.01{\times}10^2$ \\
+\bottomrule
+\end{tabular}

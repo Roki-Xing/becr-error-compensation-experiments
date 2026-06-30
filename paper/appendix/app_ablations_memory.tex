@@ -1,0 +1,25 @@
+The additional ablations retained from the corrected synthetic package are:
+\begin{itemize}
+\item no-lower-bound residual transmission (\texttt{rho\_no\_lower\_bound});
+\item coupled residual transmission with $\rho_t=\phi_t$;
+\item refresh-sweep state-reset, official-carry, projection-aware transport,
+and full current-projection residual modes;
+\item anisotropic CRN diagnostics and paired differences;
+\item CPU-only memory/runtime accounting.
+\end{itemize}
+
+\begin{table}[h]
+\caption{Claim--evidence matrix for the integrated draft.}
+\label{tab:claim-evidence}
+\input{tables/claim_evidence_matrix}
+\end{table}
+
+\begin{table}[h]
+\caption{Synthetic CPU memory/runtime accounting.}
+\label{tab:memory-accounting}
+\input{tables/memory_runtime_accounting}
+\end{table}
+
+The memory table should not be read as a GPU memory claim. It records whether
+the corrected synthetic schema tracks residual bytes and related fields, and it
+explicitly notes that no GPU peak-memory validation is part of this paper.

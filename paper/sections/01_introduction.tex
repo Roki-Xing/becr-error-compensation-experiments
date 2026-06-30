@@ -1,0 +1,44 @@
+\section{Introduction}
+
+Low-rank training methods reduce optimizer state and update rank by restricting
+adaptation to a subspace. This introduces an immediate question: what should be
+done with the discarded component of the gradient? The answer matters because
+the projected branch may converge quickly while a stale or biased subspace still
+misses a nontrivial orthogonal gradient. In that regime, progress depends on
+how the discarded direction is recovered.
+
+\Fira-style methods recover that discarded component by scaling it with
+information extracted from the low-rank adaptive branch. This mechanism is
+intuitively appealing and empirically useful, but it should not be confused
+with Error Feedback. Classical Error Feedback stores the compression error in a
+residual buffer and reintroduces that residual later. Norm recovery instead
+uses the current projected adaptive state to rescale the current discarded
+gradient. The recovery branch therefore inherits whatever mismatch exists
+between projected adaptive statistics and the omitted coordinates.
+
+This paper studies that boundary. We focus on stale-subspace diagnostics, where
+the projected coordinate can vanish before the orthogonal coordinate does. In
+that regime, the recovery scale itself may vanish and the cumulative recovered
+mass may remain finite. The consequence is a nonzero orthogonal gradient even
+though the full gradient is observable at each step.
+
+Our contributions are deliberately narrow.
+\begin{itemize}
+\item We formalize why \Fira-style norm recovery is not Error Feedback and
+separate discarded-gradient magnitude compensation from residual accumulation.
+\item We prove a verified two-dimensional positive-$\epsilon$ stale-subspace
+failure (Theorem~\ref{thm:positive-epsilon-failure}) and two repair results:
+lower-bounded clipping (Theorem~\ref{thm:clipping-repair}) and separated
+raw-gradient residual transmission with adaptive recovery scaling
+(Theorem~\ref{thm:becr-repair}).
+\item We state a contractive raw-gradient compressor
+(Proposition~\ref{prop:becr-contractivity}) and a \BECR-SGD nonconvex
+abstraction (Theorem~\ref{thm:becr-sgd}) without claiming Adam convergence or
+compressed Adam-state compensation.
+\item We integrate corrected synthetic diagnostics built under exact-Fira
+labeling guards, moving-projection state audits, and CRN/provenance tracking.
+\end{itemize}
+
+The paper is therefore a theory/mechanism paper. It does not claim optimizer
+superiority over AdamW or LDAdam, does not validate neural performance, and
+does not infer broad behavior for all official \Fira code paths.
