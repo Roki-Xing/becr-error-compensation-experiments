@@ -56,6 +56,22 @@ def test_wrong_residual_differs_when_limiter_active(adam_limiter_tiny: dict):
     assert wrong["final_residual_norm"] != pytest.approx(correct["final_residual_norm"])
 
 
+def test_appendix_recommendation_and_primary_ordering(adam_limiter_tiny: dict):
+    summary = _summary_by_name(adam_limiter_tiny, "adam_limiter_loss_summary.json")
+    claim_summary = summary["claim_summary"]
+    methods = summary["methods"]
+    becr = methods["becr_effective_signal_residual"]
+    no_residual = methods["fira_style_adam_limiter_no_residual"]
+    clipping = methods["clipping_only_limiter"]
+    wrong = methods["wrong_pre_limiter_residual"]
+
+    assert claim_summary["include_recommendation"] == "appendix"
+    assert claim_summary["primary_setting_id"] == "beta1_0.9_beta2_0.99_gamma_active"
+    assert becr["grad_norm_final"] < no_residual["grad_norm_final"]
+    assert becr["grad_norm_final"] < clipping["grad_norm_final"]
+    assert becr["grad_norm_final"] < wrong["grad_norm_final"]
+
+
 def test_no_neural_entrypoints_in_adam_limiter_diagnostic():
     runner_text = Path("corrected_synthetic/runner.py").read_text(encoding="utf-8")
     workflow_text = Path(".github/workflows/python-tests.yml").read_text(encoding="utf-8")
@@ -88,6 +104,7 @@ def test_adam_limiter_artifact_index_or_summary_exists(adam_limiter_tiny: dict):
 
 def test_claims_remain_diagnostic_only():
     text = Path("paper/sections/07_corrected_synthetic_diagnostics.tex").read_text(encoding="utf-8")
+    assert "Appendix-level limiter-active diagnostics" in text
     forbidden = [
         "Adam convergence",
         "optimizer superiority",

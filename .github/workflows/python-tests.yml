@@ -38,13 +38,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
       - name: Run corrected synthetic tiny paper-quality suite
+        env:
+          PARENT_PR: ${{ github.event.pull_request.number && format('#{0}', github.event.pull_request.number) || '#7' }}
         run: |
           python experiments/tier1-synthetic/run_corrected_synthetic_suite.py \
             --output-root /tmp/becr_p1_corrected_synthetic_ci \
             --run-id ci_corrected_synthetic \
             --paper-quality \
             --tiny \
-            --parent-pr "#4"
+            --parent-pr "${PARENT_PR}"
       - name: Validate corrected synthetic artifact index
         run: |
           python - <<'PY'
