@@ -63,6 +63,22 @@ class CoordinateConfig:
     dtype: Any = np.float64
 
 
+@dataclass(frozen=True)
+class AdamLimiterConfig:
+    lr: float
+    beta1: float
+    beta2: float
+    eps_a: float
+    eps_s: float
+    s_min: float
+    s_max: float
+    rho: float
+    rho_min: float
+    rho_max: float
+    limiter_gamma: float | None = None
+    dtype: Any = np.float64
+
+
 class DiagQuadratic:
     def __init__(self, lam: np.ndarray):
         self.lam = np.asarray(lam, dtype=float)
@@ -200,6 +216,273 @@ def _method_family(method: str) -> str:
     if method in {"becr", "rho_no_lower_bound", "coupled_unbounded", "wrong_units_naive_ef"}:
         return "corrected_residual_coordinate_diagnostic"
     raise ValueError(f"unknown method={method}")
+
+
+def _adam_limiter_method_family(method: str) -> str:
+    if method in {
+        "projected_adam_baseline",
+        "fira_style_adam_limiter_no_residual",
+        "clipping_only_limiter",
+        "becr_effective_signal_residual",
+        "wrong_pre_limiter_residual",
+        "no_lower_bound_residual",
+    }:
+        return "adam_limiter_recovery_diagnostic"
+    raise ValueError(f"unknown adam-limiter method={method}")
+
+
+def run_adam_limiter_trace(
+    *,
+    method: str,
+    quad: DiagQuadratic,
+    x0: np.ndarray,
+    steps: int,
+    schedule: ScheduleBase,
+    cfg: AdamLimiterConfig,
+    noise_bank: np.ndarray | None = None,
+    batch_size: int = 1,
+) -> dict[str, Any]:
+    dtype = np.dtype(cfg.dtype)
+    x = np.asarray(x0, dtype=dtype).copy()
+    d = int(x.shape[0])
+    residual = np.zeros((d,), dtype=dtype)
+    prev_u_perp_norm = 0.0
+    m = np.zeros((schedule.r,), dtype=dtype)
+    v = np.zeros((schedule.r,), dtype=dtype)
+    bases: list[np.ndarray] = []
+    params = [x.copy()]
+    f_series = [quad.value(x)]
+    g0 = quad.grad(x)
+    grad_norm = [safe_norm(g0)]
+    grad_par_norm = [math.nan]
+    grad_perp_norm = [math.nan]
+    update_norm = [math.nan]
+    update_cos = [math.nan]
+    phi_raw_series = [math.nan]
+    s_raw_series = [math.nan]
+    s_applied_series = [math.nan]
+    rho_series = [math.nan]
+    tau_series = [math.nan]
+    z_norm_series = [math.nan]
+    z_eff_norm_series = [math.nan]
+    lost_signal_series = [math.nan]
+    residual_norm_series = [0.0 if method in {"becr_effective_signal_residual", "wrong_pre_limiter_residual", "no_lower_bound_residual"} else math.nan]
+    residual_err_series = [0.0 if method in {"becr_effective_signal_residual", "wrong_pre_limiter_residual", "no_lower_bound_residual"} else math.nan]
+    effective_raw_transmission = [math.nan]
+    cumulative_effective_transmission = [0.0]
+    x_component = [float(x[0])]
+    y_component = [float(x[1]) if d >= 2 else 0.0]
+    m_series = [math.nan]
+    v_series = [math.nan]
+    psi_series = [math.nan]
+    steps_json: list[dict[str, Any]] = []
+    used_noise = []
+    limiter_count = 0
+
+    for t in range(int(steps)):
+        g_clean = np.asarray(quad.grad(x), dtype=dtype)
+        if batch_size <= 1:
+            if noise_bank is None:
+                noise_batch = np.zeros((1, d), dtype=dtype)
+            else:
+                noise_batch = np.asarray(noise_bank[t : t + 1], dtype=dtype)
+        else:
+            noise_batch = np.zeros((batch_size, d), dtype=dtype) if noise_bank is None else np.asarray(noise_bank[t], dtype=dtype)
+        g_batch = g_clean.reshape(1, d) + noise_batch
+        g_batch_matrix = np.asarray(g_batch, dtype=dtype).T
+        g_used = np.asarray(g_batch, dtype=dtype).mean(axis=0)
+        used_noise.append(np.asarray(noise_batch, dtype=dtype).copy())
+
+        P = np.asarray(schedule.basis(t=t, x=x.copy(), g_batch=g_batch_matrix.copy()), dtype=dtype)
+        bases.append(P.copy())
+        A = g_used + residual
+        R, _, Q = _decompose(A, P)
+        _, g_parallel_clean, g_perp_clean = _decompose(g_clean, P)
+
+        m = float(cfg.beta1) * np.asarray(m, dtype=dtype) + (1.0 - float(cfg.beta1)) * np.asarray(R, dtype=dtype)
+        v = float(cfg.beta2) * np.asarray(v, dtype=dtype) + (1.0 - float(cfg.beta2)) * np.square(np.asarray(R, dtype=dtype))
+        psi_R = np.asarray(m, dtype=dtype) / (np.sqrt(np.asarray(v, dtype=dtype)) + float(cfg.eps_a))
+        u_parallel = np.asarray(P, dtype=dtype) @ psi_R
+        phi_raw = float(safe_norm(psi_R) / (safe_norm(R) + float(cfg.eps_s)))
+        s_raw = float(phi_raw)
+
+        if method == "projected_adam_baseline":
+            s_applied = 0.0
+            rho_t = math.nan
+            tau_t = 1.0
+            Z = np.zeros_like(Q)
+            Z_eff = np.zeros_like(Q)
+            u_perp = np.zeros_like(Q)
+            residual_next = np.zeros_like(residual)
+            residual_error = 0.0
+        else:
+            if method == "fira_style_adam_limiter_no_residual":
+                s_applied = float(phi_raw)
+                rho_t = math.nan
+            else:
+                s_applied = _clip(phi_raw, cfg.s_min, cfg.s_max)
+                if method == "clipping_only_limiter":
+                    rho_t = math.nan
+                elif method == "becr_effective_signal_residual":
+                    rho_t = _clip(cfg.rho, cfg.rho_min, cfg.rho_max)
+                elif method == "wrong_pre_limiter_residual":
+                    rho_t = _clip(cfg.rho, cfg.rho_min, cfg.rho_max)
+                elif method == "no_lower_bound_residual":
+                    rho_t = float(min(phi_raw, float(cfg.rho_max)))
+                else:
+                    raise ValueError(f"unsupported adam-limiter method={method}")
+
+            Z = np.asarray(Q, dtype=dtype).copy() if not math.isfinite(float(rho_t)) else float(rho_t) * np.asarray(Q, dtype=dtype)
+            tau_t = 1.0
+            raw_u_perp = s_applied * Z
+            raw_u_perp_norm = safe_norm(raw_u_perp)
+            if cfg.limiter_gamma is not None and prev_u_perp_norm > 0.0 and raw_u_perp_norm > float(cfg.limiter_gamma) * prev_u_perp_norm:
+                tau_t = float(float(cfg.limiter_gamma) * prev_u_perp_norm / raw_u_perp_norm)
+                limiter_count += 1
+            Z_eff = tau_t * Z
+            u_perp = s_applied * Z_eff
+            if method == "becr_effective_signal_residual":
+                residual_next = np.asarray(Q, dtype=dtype) - Z_eff
+                residual_error = safe_norm(residual_next - (np.asarray(Q, dtype=dtype) - Z_eff))
+            elif method == "wrong_pre_limiter_residual":
+                residual_next = np.asarray(Q, dtype=dtype) - Z
+                residual_error = safe_norm(residual_next - (np.asarray(Q, dtype=dtype) - Z_eff))
+            elif method == "no_lower_bound_residual":
+                residual_next = np.asarray(Q, dtype=dtype) - Z_eff
+                residual_error = safe_norm(residual_next - (np.asarray(Q, dtype=dtype) - Z_eff))
+            else:
+                residual_next = np.zeros_like(residual)
+                residual_error = 0.0
+        prev_u_perp_norm = safe_norm(u_perp)
+
+        u = np.asarray(u_parallel, dtype=dtype) + np.asarray(u_perp, dtype=dtype)
+        x_next = np.asarray(x, dtype=dtype) - float(cfg.lr) * u
+        g_clean_next = np.asarray(quad.grad(x_next), dtype=dtype)
+        lost_signal_norm = safe_norm(np.asarray(Z, dtype=dtype) - np.asarray(Z_eff, dtype=dtype))
+        effective_transmission = (safe_norm(Z_eff) / safe_norm(Q)) if safe_norm(Q) > 0.0 else None
+        cumulative_effective_transmission_value = cumulative_effective_transmission[-1] + (0.0 if effective_transmission is None or not math.isfinite(float(effective_transmission)) else float(effective_transmission))
+
+        steps_json.append(
+            {
+                "step_index": int(t),
+                "x_before": x.copy().tolist(),
+                "x_after": x_next.copy().tolist(),
+                "g_clean": g_clean.copy().tolist(),
+                "g_used": g_used.copy().tolist(),
+                "A": A.copy().tolist(),
+                "P": P.copy().tolist(),
+                "R": np.asarray(R, dtype=dtype).copy().tolist(),
+                "Q": np.asarray(Q, dtype=dtype).copy().tolist(),
+                "m": np.asarray(m, dtype=dtype).copy().tolist(),
+                "v": np.asarray(v, dtype=dtype).copy().tolist(),
+                "psi": np.asarray(psi_R, dtype=dtype).copy().tolist(),
+                "u_parallel": np.asarray(u_parallel, dtype=dtype).copy().tolist(),
+                "u_perp": np.asarray(u_perp, dtype=dtype).copy().tolist(),
+                "phi_raw": float(phi_raw),
+                "s_raw": float(s_raw),
+                "s_applied": float(s_applied),
+                "rho": None if not math.isfinite(float(rho_t)) else float(rho_t),
+                "tau": float(tau_t),
+                "Z_norm": safe_norm(Z),
+                "Z_eff_norm": safe_norm(Z_eff),
+                "lost_raw_signal_norm": lost_signal_norm,
+                "effective_raw_transmission": effective_transmission,
+                "residual_norm": safe_norm(residual_next),
+                "residual_update_error": float(residual_error),
+                "limiter_active": bool(abs(float(tau_t) - 1.0) > 1e-12),
+                "g_parallel_clean_norm": safe_norm(g_parallel_clean),
+                "g_perp_clean_norm": safe_norm(g_perp_clean),
+                "cumulative_effective_transmission": float(cumulative_effective_transmission_value),
+            }
+        )
+
+        x = np.asarray(x_next, dtype=dtype)
+        residual = np.asarray(residual_next, dtype=dtype)
+        params.append(x.copy())
+        f_series.append(quad.value(x))
+        grad_norm.append(safe_norm(g_clean_next))
+        grad_par_norm.append(safe_norm(g_parallel_clean))
+        grad_perp_norm.append(safe_norm(g_perp_clean))
+        update_norm.append(safe_norm(u))
+        update_cos.append(cosine(u, g_clean))
+        phi_raw_series.append(float(phi_raw))
+        s_raw_series.append(float(s_raw))
+        s_applied_series.append(float(s_applied))
+        rho_series.append(float(rho_t) if math.isfinite(float(rho_t)) else math.nan)
+        tau_series.append(float(tau_t))
+        z_norm_series.append(safe_norm(Z))
+        z_eff_norm_series.append(safe_norm(Z_eff))
+        lost_signal_series.append(lost_signal_norm)
+        residual_norm_series.append(safe_norm(residual))
+        residual_err_series.append(float(residual_error))
+        effective_raw_transmission.append(math.nan if effective_transmission is None else float(effective_transmission))
+        cumulative_effective_transmission.append(float(cumulative_effective_transmission_value))
+        x_component.append(float(x[0]))
+        y_component.append(float(x[1]) if d >= 2 else 0.0)
+        m_series.append(float(np.asarray(m, dtype=float).reshape(-1)[0]) if np.asarray(m).size else math.nan)
+        v_series.append(float(np.asarray(v, dtype=float).reshape(-1)[0]) if np.asarray(v).size else math.nan)
+        psi_series.append(float(np.asarray(psi_R, dtype=float).reshape(-1)[0]) if np.asarray(psi_R).size else math.nan)
+
+    noise_used = np.asarray(used_noise, dtype=dtype)
+    basis_overlap = [None]
+    for idx in range(1, len(bases)):
+        prev = np.asarray(bases[idx - 1], dtype=float)
+        cur = np.asarray(bases[idx], dtype=float)
+        overlap = cur.T @ prev
+        denom = math.sqrt(float(min(cur.shape[1], prev.shape[1])))
+        basis_overlap.append(float(np.linalg.norm(overlap, ord="fro") / denom) if denom > 0 else None)
+
+    return {
+        "method": method,
+        "method_family": _adam_limiter_method_family(method),
+        "projection_mode": schedule.projection_mode,
+        "scheduler_factory_id": schedule.scheduler_factory_id,
+        "scheduler_object_id": schedule.scheduler_object_id,
+        "noise_hash": hash_noise_bank(noise_used),
+        "consumed_noise_hash": hash_noise_bank(noise_used),
+        "steps": steps_json,
+        "series": {
+            "f": f_series,
+            "grad_norm": grad_norm,
+            "grad_par_norm": grad_par_norm,
+            "grad_perp_norm": grad_perp_norm,
+            "update_norm": update_norm,
+            "update_cos": update_cos,
+            "phi_raw": phi_raw_series,
+            "s_raw": s_raw_series,
+            "s_applied": s_applied_series,
+            "rho": rho_series,
+            "tau": tau_series,
+            "Z_norm": z_norm_series,
+            "Z_eff_norm": z_eff_norm_series,
+            "lost_raw_signal_norm": lost_signal_series,
+            "effective_raw_transmission": effective_raw_transmission,
+            "cumulative_effective_transmission": cumulative_effective_transmission,
+            "residual_norm": residual_norm_series,
+            "residual_update_error": residual_err_series,
+            "phi_cum": np.nancumsum(np.asarray(phi_raw_series, dtype=float)).tolist(),
+            "s_applied_cum": np.nancumsum(np.asarray(s_applied_series, dtype=float)).tolist(),
+            "x_component": x_component,
+            "y_component": y_component,
+            "basis_overlap": basis_overlap,
+            "m": m_series,
+            "v": v_series,
+            "psi": psi_series,
+        },
+        "final_state": {
+            "x": np.asarray(params[-1], dtype=float).tolist(),
+            "f": float(f_series[-1]),
+            "grad_norm": float(grad_norm[-1]),
+            "grad_par_norm": float(grad_par_norm[-1]),
+            "grad_perp_norm": float(grad_perp_norm[-1]),
+            "phi_cum": float(np.nansum(np.asarray(phi_raw_series, dtype=float))),
+            "s_applied_cum": float(np.nansum(np.asarray(s_applied_series, dtype=float))),
+            "residual_norm": float(residual_norm_series[-1]) if math.isfinite(float(residual_norm_series[-1])) else None,
+        },
+        "limiter_count": int(limiter_count),
+        "params": np.asarray(params, dtype=float),
+        "bases": np.asarray(bases, dtype=float) if bases else np.zeros((0, d, schedule.r), dtype=float),
+    }
 
 
 def run_coordinate_trace(
