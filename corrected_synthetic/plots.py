@@ -241,3 +241,84 @@ def plot_anisotropic_noise(
         main_or_appendix_recommendation="appendix-or-main-panel",
     )
     return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}
+
+
+def plot_adam_limiter_loss(
+    *,
+    out_dir: Path,
+    aggregate_manifest_path: Path,
+    aggregate_manifest: dict[str, Any],
+    setting_id: str,
+    method_payloads: dict[str, dict[str, Any]],
+) -> dict[str, Path]:
+    order = [
+        "projected_adam_baseline",
+        "fira_style_adam_limiter_no_residual",
+        "clipping_only_limiter",
+        "becr_effective_signal_residual",
+        "wrong_pre_limiter_residual",
+        "no_lower_bound_residual",
+    ]
+    labels = {
+        "projected_adam_baseline": "Projected Adam",
+        "fira_style_adam_limiter_no_residual": "No residual",
+        "clipping_only_limiter": "Clipping only",
+        "becr_effective_signal_residual": "BECR effective",
+        "wrong_pre_limiter_residual": "Wrong residual",
+        "no_lower_bound_residual": "No-lower rho",
+    }
+    colors = {
+        "projected_adam_baseline": "#666666",
+        "fira_style_adam_limiter_no_residual": "#d62728",
+        "clipping_only_limiter": "#1f77b4",
+        "becr_effective_signal_residual": "#2ca02c",
+        "wrong_pre_limiter_residual": "#9467bd",
+        "no_lower_bound_residual": "#ff7f0e",
+    }
+    fig, axs = plt.subplots(2, 2, figsize=(13.6, 8.0))
+    ax_tau, ax_z, ax_resid, ax_grad = axs.flatten()
+    for method in order:
+        if method not in method_payloads:
+            continue
+        series = method_payloads[method]["series"]
+        xs = list(range(len(series["tau"])))
+        ax_tau.plot(xs, series["tau"], label=labels[method], color=colors[method], linewidth=1.5)
+        ax_resid.plot(xs, np.maximum(series["residual_norm"], 1e-300), label=labels[method], color=colors[method], linewidth=1.5)
+        ax_grad.plot(xs, np.maximum(series["grad_norm"], 1e-300), label=labels[method], color=colors[method], linewidth=1.5)
+
+    if "becr_effective_signal_residual" in method_payloads:
+        becr = method_payloads["becr_effective_signal_residual"]["series"]
+        xs = list(range(len(becr["Z_norm"])))
+        ax_z.plot(xs, np.maximum(becr["Z_norm"], 1e-300), label="|Z_t|", color="#4c72b0", linewidth=1.6)
+        ax_z.plot(xs, np.maximum(becr["Z_eff_norm"], 1e-300), label="|Z_t_eff|", color="#dd8452", linewidth=1.6)
+        ax_z.plot(xs, np.maximum(becr["lost_raw_signal_norm"], 1e-300), label="|Z_t-Z_t_eff|", color="#55a868", linewidth=1.4, linestyle="--")
+
+    ax_tau.set_title(f"(a) limiter tau, {setting_id}")
+    ax_z.set_title("(b) raw vs effective transmitted signal")
+    ax_resid.set_title("(c) residual norm")
+    ax_grad.set_title("(d) gradient norm")
+    ax_tau.set_xlabel("step")
+    ax_z.set_xlabel("step")
+    ax_resid.set_xlabel("step")
+    ax_grad.set_xlabel("step")
+    ax_tau.grid(True, alpha=0.3)
+    for ax in [ax_z, ax_resid, ax_grad]:
+        ax.set_yscale("log")
+        ax.grid(True, alpha=0.3)
+    ax_tau.legend(loc="best", fontsize=8)
+    ax_z.legend(loc="best", fontsize=8)
+    fig.tight_layout()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path_base = out_dir / "figure_candidate_5_adam_limiter_loss"
+    fig.savefig(path_base.with_suffix(".png"), dpi=220)
+    fig.savefig(path_base.with_suffix(".pdf"))
+    plt.close(fig)
+    meta = _write_plot_metadata(
+        path_base=path_base,
+        title="Adam limiter-loss recovery diagnostic",
+        aggregate_manifest_path=aggregate_manifest_path,
+        aggregate_manifest=aggregate_manifest,
+        candidate_level="appendix-candidate",
+        main_or_appendix_recommendation="appendix-candidate",
+    )
+    return {"png": path_base.with_suffix(".png"), "pdf": path_base.with_suffix(".pdf"), "metadata": meta}

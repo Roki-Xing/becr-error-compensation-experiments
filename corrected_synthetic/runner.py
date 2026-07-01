@@ -24,6 +24,7 @@ from fira_parity.runner import run_fixture
 from moving_projection_state.core import MovingProjectionConfig
 
 from .core import (
+    AdamLimiterConfig,
     CoordinateConfig,
     DiagQuadratic,
     FixedBasisSchedule,
@@ -31,12 +32,14 @@ from .core import (
     TopGradientRefreshSchedule,
     confidence_interval,
     generate_crn_noise_bank,
+    run_adam_limiter_trace,
     run_coordinate_trace,
     run_moving_projection_dynamic_trace,
     theorem_condition_report,
     wall_clock_ms,
 )
 from .plots import (
+    plot_adam_limiter_loss,
     plot_anisotropic_noise,
     plot_high_dimensional,
     plot_refresh_sweep,
@@ -52,6 +55,14 @@ DEFAULT_COORD_METHODS = [
     "becr",
     "rho_no_lower_bound",
     "coupled_unbounded",
+]
+DEFAULT_ADAM_LIMITER_METHODS = [
+    "projected_adam_baseline",
+    "fira_style_adam_limiter_no_residual",
+    "clipping_only_limiter",
+    "becr_effective_signal_residual",
+    "wrong_pre_limiter_residual",
+    "no_lower_bound_residual",
 ]
 
 
@@ -102,6 +113,25 @@ def _memory_schema_for_state(*, d: int, rank: int, cfg: MovingProjectionConfig, 
     )
 
 
+def _memory_schema_for_adam_limiter(*, trace: dict[str, Any], d: int, rank: int, cfg: AdamLimiterConfig, elapsed_ms: float) -> dict[str, Any]:
+    itemsize = np.dtype(cfg.dtype).itemsize
+    residual_bytes = d * itemsize if trace["method"] in {"becr_effective_signal_residual", "wrong_pre_limiter_residual", "no_lower_bound_residual"} else 0
+    return build_memory_runtime_schema(
+        device="cpu",
+        parameter_bytes=d * itemsize,
+        gradient_buffer_bytes=d * itemsize,
+        first_moment_bytes=rank * itemsize,
+        second_moment_bytes=rank * itemsize,
+        projection_bytes=d * rank * itemsize,
+        residual_bytes=residual_bytes,
+        temporary_buffer_bytes_estimate=6 * d * itemsize,
+        peak_memory_allocated=None,
+        peak_memory_reserved=None,
+        optimizer_step_time_ms=elapsed_ms / max(len(trace["steps"]), 1),
+        wall_clock_time_ms=elapsed_ms,
+    )
+
+
 def _scale_rows_from_coordinate(trace: dict[str, Any]) -> list[dict[str, Any]]:
     rows = []
     for row in trace["steps"]:
@@ -121,6 +151,35 @@ def _scale_rows_from_coordinate(trace: dict[str, Any]) -> list[dict[str, Any]]:
                 "raw_recovery_scale": row["phi_raw"],
                 "applied_recovery_scale": row["s_applied"],
                 "effective_recovery_scale": row["s_applied"] * row["tau"],
+            }
+        )
+    return rows
+
+
+def _scale_rows_from_adam_limiter(trace: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = []
+    for row in trace["steps"]:
+        rows.append(
+            {
+                "step_index": row["step_index"],
+                "phi_raw": row["phi_raw"],
+                "s_raw": row["s_raw"],
+                "s_applied": row["s_applied"],
+                "rho": row["rho"],
+                "tau": row["tau"],
+                "Z_norm": row["Z_norm"],
+                "Z_eff_norm": row["Z_eff_norm"],
+                "lost_raw_signal_norm": row["lost_raw_signal_norm"],
+                "effective_raw_transmission": row["effective_raw_transmission"],
+                "residual_update_error": row["residual_update_error"],
+                "limiter_active": row["limiter_active"],
+                "raw_recovery_scale": row["phi_raw"],
+                "applied_recovery_scale": row["s_applied"],
+                "effective_recovery_scale": row["s_applied"] * row["tau"],
+                "m": row["m"],
+                "v": row["v"],
+                "psi": row["psi"],
+                "cumulative_effective_transmission": row["cumulative_effective_transmission"],
             }
         )
     return rows
@@ -196,6 +255,43 @@ def _state_metric_summary(mode: str, trace: dict[str, Any], noise_hash: str, see
         "phi_raw_p95": float(np.nanpercentile(phi_finite, 95)) if phi_finite.size else None,
         "phi_raw_p99": float(np.nanpercentile(phi_finite, 99)) if phi_finite.size else None,
         "reset_events": trace["reset_events"],
+    }
+
+
+def _adam_limiter_metric_summary(method: str, trace: dict[str, Any], setting_id: str) -> dict[str, Any]:
+    series = trace["series"]
+    phi = np.asarray(series["phi_raw"], dtype=float)
+    phi_finite = phi[np.isfinite(phi)]
+    tau = np.asarray(series["tau"], dtype=float)
+    tau_finite = tau[np.isfinite(tau)]
+    limiter_active = tau_finite[np.abs(tau_finite - 1.0) > 1e-12]
+    lost = np.asarray(series["lost_raw_signal_norm"], dtype=float)
+    lost_finite = lost[np.isfinite(lost)]
+    return {
+        "method": method,
+        "family": trace["method_family"],
+        "seed": 0,
+        "noise_hash": trace["noise_hash"],
+        "consumed_noise_hash": trace["consumed_noise_hash"],
+        "setting_id": setting_id,
+        "grad_norm_final": float(series["grad_norm"][-1]),
+        "grad_par_norm_final": float(series["grad_par_norm"][-1]),
+        "grad_perp_norm_final": float(series["grad_perp_norm"][-1]),
+        "f_final": float(series["f"][-1]),
+        "phi_raw_cum_final": float(series["phi_cum"][-1]),
+        "s_applied_cum_final": float(series["s_applied_cum"][-1]),
+        "residual_norm_final": float(series["residual_norm"][-1]) if math.isfinite(float(series["residual_norm"][-1])) else None,
+        "residual_update_error_max": float(np.nanmax(np.asarray(series["residual_update_error"], dtype=float))),
+        "phi_raw_p95": float(np.nanpercentile(phi_finite, 95)) if phi_finite.size else None,
+        "tau_min": float(np.nanmin(tau_finite)) if tau_finite.size else None,
+        "tau_max": float(np.nanmax(tau_finite)) if tau_finite.size else None,
+        "tau_mean": float(np.nanmean(tau_finite)) if tau_finite.size else None,
+        "limiter_activation_count": int(trace.get("limiter_count", 0)),
+        "limiter_activation_rate": float(trace.get("limiter_count", 0) / max(len(trace["steps"]), 1)),
+        "lost_raw_signal_total": float(np.nansum(lost_finite)) if lost_finite.size else 0.0,
+        "lost_raw_signal_max": float(np.nanmax(lost_finite)) if lost_finite.size else 0.0,
+        "final_residual_norm": float(series["residual_norm"][-1]) if math.isfinite(float(series["residual_norm"][-1])) else 0.0,
+        "final_cumulative_effective_transmission": float(series["cumulative_effective_transmission"][-1]),
     }
 
 
@@ -411,6 +507,51 @@ def _claim_summary_for_anisotropic(summary: dict[str, Any]) -> dict[str, Any]:
         "becr_beats_clipped_on_grad_norm_mean": becr_beats_clipped,
         "becr_beats_raw_on_grad_norm_mean": becr_beats_raw,
         "becr_beats_projected_baseline_on_grad_norm_mean": becr_beats_proj,
+        "statement": statement,
+    }
+
+
+def _claim_summary_for_adam_limiter(summary: dict[str, Any]) -> dict[str, Any]:
+    primary = summary["settings"][summary["primary_setting_id"]]
+    becr = primary["methods"]["becr_effective_signal_residual"]
+    wrong = primary["methods"]["wrong_pre_limiter_residual"]
+    clipping = primary["methods"]["clipping_only_limiter"]
+    no_residual = primary["methods"]["fira_style_adam_limiter_no_residual"]
+    projected = primary["methods"]["projected_adam_baseline"]
+    limiter_active = bool(becr["limiter_activation_count"] > 0)
+    wrong_distinguishable = bool(wrong["wrong_vs_correct_residual_gap"] > 1e-8)
+    becr_beats_wrong = bool(becr["grad_norm_final"] < wrong["grad_norm_final"])
+    becr_beats_no_residual = bool(becr["grad_norm_final"] < no_residual["grad_norm_final"])
+    becr_beats_clipping = bool(becr["grad_norm_final"] < clipping["grad_norm_final"])
+    becr_beats_projected = bool(becr["grad_norm_final"] < projected["grad_norm_final"])
+    clipping_explains_all = bool(
+        clipping["grad_norm_final"] <= becr["grad_norm_final"] * (1.0 + 1e-8)
+        and clipping["final_residual_norm"] <= becr["final_residual_norm"] * (1.0 + 1e-8)
+    )
+
+    if limiter_active and wrong_distinguishable and becr_beats_wrong and becr_beats_no_residual and becr_beats_clipping:
+        include = "appendix"
+        statement = (
+            "Limiter-active diagnostics show that recovery residuals must be updated using the effective transmitted raw signal. "
+            "This remains an appendix-level recovery-branch diagnostic and not an Adam convergence or optimizer-superiority claim."
+        )
+    else:
+        include = "drop"
+        statement = (
+            "The Adam limiter-loss diagnostic does not support a stronger paper claim than the existing SGD/recovery evidence. "
+            "It should be treated as inconclusive or future-work-only."
+        )
+
+    return {
+        "primary_setting_id": summary["primary_setting_id"],
+        "limiter_active_primary": limiter_active,
+        "wrong_residual_distinguishable": wrong_distinguishable,
+        "becr_beats_wrong_residual": becr_beats_wrong,
+        "becr_beats_no_residual": becr_beats_no_residual,
+        "becr_beats_clipping_only": becr_beats_clipping,
+        "becr_beats_projected_baseline": becr_beats_projected,
+        "clipping_only_explains_all": clipping_explains_all,
+        "include_recommendation": include,
         "statement": statement,
     }
 
@@ -1237,6 +1378,244 @@ def _run_anisotropic_noise(
     }
 
 
+def _run_adam_limiter_loss_diagnostic(
+    *,
+    group_dir: Path,
+    output_root: Path,
+    metadata: dict[str, Any],
+    tiny: bool,
+    paper_quality: bool,
+    parent_pr: str | None,
+) -> dict[str, Any]:
+    experiment_name = "adam_limiter_loss_diagnostic"
+    exp_dir = _experiment_dir(group_dir, experiment_name)
+    methods = list(DEFAULT_ADAM_LIMITER_METHODS)
+    steps = 80 if tiny else 160
+    a = 1.0
+    b = 1.0
+    x0 = np.asarray([0.5, 1.0], dtype=np.float64)
+    quad = DiagQuadratic(np.asarray([a, b], dtype=float))
+    basis = np.asarray([[1.0], [0.0]], dtype=float)
+    setting_specs = [
+        {"setting_id": "beta1_0.0_beta2_0.0_gamma_active", "beta1": 0.0, "beta2": 0.0, "limiter_gamma": 1.01},
+        {"setting_id": "beta1_0.0_beta2_0.0_gamma_inactive", "beta1": 0.0, "beta2": 0.0, "limiter_gamma": 10.0},
+        {"setting_id": "beta1_0.9_beta2_0.99_gamma_active", "beta1": 0.9, "beta2": 0.99, "limiter_gamma": 1.01},
+        {"setting_id": "beta1_0.9_beta2_0.99_gamma_inactive", "beta1": 0.9, "beta2": 0.99, "limiter_gamma": 10.0},
+    ]
+    primary_setting_id = "beta1_0.9_beta2_0.99_gamma_active"
+    manifest_paths = []
+    memory_paths = []
+    scale_log_paths = []
+    metric_rows = []
+    per_setting_summary: dict[str, Any] = {}
+    primary_payloads: dict[str, dict[str, Any]] = {}
+    run_command = _command_for_run(
+        output_root=output_root,
+        run_id=group_dir.name,
+        experiment_name=experiment_name,
+        tiny=tiny,
+        paper_quality=paper_quality,
+        parent_pr=parent_pr,
+    )
+
+    for setting in setting_specs:
+        setting_id = setting["setting_id"]
+        cfg = AdamLimiterConfig(
+            lr=0.02,
+            beta1=float(setting["beta1"]),
+            beta2=float(setting["beta2"]),
+            eps_a=1e-8,
+            eps_s=1e-3,
+            s_min=0.25,
+            s_max=20.0,
+            rho=0.7,
+            rho_min=1e-6,
+            rho_max=1.0,
+            limiter_gamma=float(setting["limiter_gamma"]),
+            dtype=np.float64,
+        )
+        config = _config_dict(
+            experiment_name,
+            {
+                "a": a,
+                "b": b,
+                "x0": x0.tolist(),
+                "steps": steps,
+                "methods": methods,
+                "basis": "fixed_e1",
+                "beta1": cfg.beta1,
+                "beta2": cfg.beta2,
+                "eps_a": cfg.eps_a,
+                "eps_s": cfg.eps_s,
+                "s_min": cfg.s_min,
+                "s_max": cfg.s_max,
+                "rho": cfg.rho,
+                "limiter_gamma": cfg.limiter_gamma,
+                "setting_id": setting_id,
+            },
+        )
+        cfg_hash = config_hash(config)
+        setting_rows: dict[str, dict[str, Any]] = {}
+        setting_traces: dict[str, dict[str, Any]] = {}
+        for method in methods:
+            started = utc_timestamp()
+            schedule = FixedBasisSchedule(basis.copy(), projection_mode="fixed_e1")
+            start_perf = time.perf_counter()
+            trace = run_adam_limiter_trace(
+                method=method,
+                quad=quad,
+                x0=x0,
+                steps=steps,
+                schedule=schedule,
+                cfg=cfg,
+            )
+            elapsed_ms = wall_clock_ms(start_perf)
+            run_id = build_run_id(
+                task=TASK_ID,
+                experiment=f"{experiment_name}_{setting_id}",
+                method=method,
+                seed=0,
+                short_commit=str(metadata["short_commit"]),
+                config_hash_value=cfg_hash,
+                timestamp=started,
+            )
+            run_dir = exp_dir / "runs" / run_id
+            run_dir.mkdir(parents=True, exist_ok=False)
+            metrics = _adam_limiter_metric_summary(method, trace, setting_id)
+            memory = _memory_schema_for_adam_limiter(trace=trace, d=2, rank=1, cfg=cfg, elapsed_ms=elapsed_ms)
+            outputs = {
+                "run_id": run_id,
+                "manifest": str(run_dir / "manifest.json"),
+                "metrics": str(run_dir / "metrics.json"),
+                "memory_runtime": str(run_dir / "memory_runtime.json"),
+                "scale_log": str(run_dir / "scale_log.jsonl"),
+                "trace": str(run_dir / "trace.json"),
+            }
+            if method == "projected_adam_baseline":
+                residual_mode = "none"
+            elif method in {"fira_style_adam_limiter_no_residual", "clipping_only_limiter"}:
+                residual_mode = "none"
+            elif method == "becr_effective_signal_residual":
+                residual_mode = "current_projection_compensated_effective_signal"
+            elif method == "wrong_pre_limiter_residual":
+                residual_mode = "wrong_pre_limiter_signal"
+            else:
+                residual_mode = "rho_no_lower_bound"
+            manifest = _base_manifest(
+                metadata=metadata,
+                config=config,
+                cfg_hash=cfg_hash,
+                method=method,
+                seed=0,
+                noise_hash=None,
+                scheduler_factory_id=trace["scheduler_factory_id"],
+                scheduler_object_id=trace["scheduler_object_id"],
+                started_at=started,
+                completed_at=utc_timestamp(),
+                optimizer_semantics=trace["method_family"],
+                projection_mode=trace["projection_mode"],
+                state_transport_mode="not_applicable",
+                residual_mode=residual_mode,
+                second_moment_mode="adam_projected_moments",
+                command=run_command,
+                parent_pr=parent_pr,
+                outputs=outputs,
+            )
+            manifest_path, _, memory_path, scale_log_path = _write_run_artifacts(
+                run_dir=run_dir,
+                manifest=manifest,
+                metrics=metrics,
+                memory=memory,
+                scale_rows=_scale_rows_from_adam_limiter(trace),
+                trace=trace,
+            )
+            manifest_paths.append(manifest_path)
+            memory_paths.append(memory_path)
+            scale_log_paths.append(scale_log_path)
+            metric_rows.append(metrics)
+            setting_rows[method] = metrics
+            setting_traces[method] = trace
+
+        correct_trace = setting_traces["becr_effective_signal_residual"]
+        wrong_trace = setting_traces["wrong_pre_limiter_residual"]
+        wrong_gap = float(
+            np.nanmax(
+                np.abs(
+                    np.asarray(wrong_trace["series"]["residual_norm"], dtype=float)
+                    - np.asarray(correct_trace["series"]["residual_norm"], dtype=float)
+                )
+            )
+        )
+        setting_rows["wrong_pre_limiter_residual"]["wrong_vs_correct_residual_gap"] = wrong_gap
+        setting_rows["becr_effective_signal_residual"]["wrong_vs_correct_residual_gap"] = wrong_gap
+
+        per_setting_summary[setting_id] = {
+            "beta1": cfg.beta1,
+            "beta2": cfg.beta2,
+            "limiter_gamma": cfg.limiter_gamma,
+            "methods": setting_rows,
+        }
+        if setting_id == primary_setting_id:
+            primary_payloads = setting_traces
+
+    aggregate_id = f"{group_dir.name}_{experiment_name}_aggregate"
+    aggregate_info = write_explicit_aggregate(
+        output_dir=exp_dir / "aggregates" / aggregate_id,
+        run_manifest_paths=manifest_paths,
+        parent_task_id=TASK_ID,
+        aggregate_id=aggregate_id,
+    )
+    aggregate_manifest = aggregate_info["aggregate_manifest"]
+    summary = {
+        "experiment_name": experiment_name,
+        "aggregate_id": aggregate_id,
+        "seed_count": 1,
+        "primary_setting_id": primary_setting_id,
+        "source_run_ids": aggregate_manifest["source_run_ids"],
+        "source_manifest_paths": aggregate_manifest["source_manifest_paths"],
+        "methods": per_setting_summary[primary_setting_id]["methods"],
+        "settings": per_setting_summary,
+        "claim_summary": {},
+        "paper_quality": paper_quality,
+    }
+    summary["claim_summary"] = _claim_summary_for_adam_limiter(summary)
+    summary_path = exp_dir / "aggregates" / aggregate_id / "adam_limiter_loss_summary.json"
+    write_json_strict(summary_path, summary, sort_keys=True)
+    table_path = exp_dir / "tables" / "adam_limiter_loss_table.md"
+    lines = [
+        "# Adam Limiter-Loss Summary",
+        "",
+        f"Primary setting: `{primary_setting_id}`",
+        "",
+        "| Method | final ||grad|| | final residual | limiter count | tau_min | lost raw signal total |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    for method, row in per_setting_summary[primary_setting_id]["methods"].items():
+        lines.append(
+            f"| {method} | {row['grad_norm_final']:.6e} | {row['final_residual_norm']:.6e} | {row['limiter_activation_count']} | {0.0 if row['tau_min'] is None else row['tau_min']:.6e} | {row['lost_raw_signal_total']:.6e} |"
+        )
+    table_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    fig = plot_adam_limiter_loss(
+        out_dir=exp_dir / "figures",
+        aggregate_manifest_path=aggregate_info["aggregate_manifest_path"],
+        aggregate_manifest=aggregate_manifest,
+        setting_id=primary_setting_id,
+        method_payloads=primary_payloads,
+    )
+    return {
+        "manifest_paths": manifest_paths,
+        "memory_paths": memory_paths,
+        "scale_log_paths": scale_log_paths,
+        "aggregate_manifest_path": aggregate_info["aggregate_manifest_path"],
+        "aggregate_summary_path": aggregate_info["summary_path"],
+        "experiment_summary_path": summary_path,
+        "plot_metadata_paths": [fig["metadata"]],
+        "figure_paths": [fig["png"], fig["pdf"]],
+        "table_paths": [table_path],
+        "method_order_report": [{k: row[k] for k in ("method", "noise_hash", "consumed_noise_hash")} for row in metric_rows],
+    }
+
+
 def _run_exact_fira_fixture(*, group_dir: Path) -> dict[str, Any]:
     exp_dir = _experiment_dir(group_dir, "exact_fira_fixture")
     fixture = run_fixture("shape_2x1_rank1_gap1_fp64")
@@ -1293,7 +1672,16 @@ def run_corrected_synthetic_suite(
     if paper_quality and metadata["dirty"] and not allow_dirty:
         raise RuntimeError("paper-quality run requires a clean worktree unless allow_dirty is set")
     group_dir.mkdir(parents=True, exist_ok=False)
-    selected = list(experiments or ["theorem_regime", "high_dimensional_fixed", "refresh_sweep", "anisotropic_noise"])
+    selected = list(
+        experiments
+        or [
+            "theorem_regime",
+            "high_dimensional_fixed",
+            "refresh_sweep",
+            "anisotropic_noise",
+            "adam_limiter_loss_diagnostic",
+        ]
+    )
     command = command or _command_for_run(output_root=output_root, run_id=run_id, experiment_name=None, tiny=tiny, paper_quality=paper_quality, parent_pr=parent_pr)
     results = {
         "group_dir": group_dir,
@@ -1340,6 +1728,21 @@ def run_corrected_synthetic_suite(
         results["aggregate_summary_paths"].append(noise_out["aggregate_summary_path"])
         results["experiment_summary_paths"].append(noise_out["experiment_summary_path"])
         results["method_order_report"]["anisotropic_noise"] = noise_out["method_order_report"]
+    if "adam_limiter_loss_diagnostic" in selected:
+        adam_out = _run_adam_limiter_loss_diagnostic(
+            group_dir=group_dir,
+            output_root=output_root,
+            metadata=metadata,
+            tiny=tiny,
+            paper_quality=paper_quality,
+            parent_pr=parent_pr,
+        )
+        for key in ("manifest_paths", "memory_paths", "scale_log_paths", "figure_paths", "plot_metadata_paths", "table_paths"):
+            results[key].extend(adam_out[key])
+        results["aggregate_manifest_paths"].append(adam_out["aggregate_manifest_path"])
+        results["aggregate_summary_paths"].append(adam_out["aggregate_summary_path"])
+        results["experiment_summary_paths"].append(adam_out["experiment_summary_path"])
+        results["method_order_report"]["adam_limiter_loss_diagnostic"] = adam_out["method_order_report"]
     exact_out = _run_exact_fira_fixture(group_dir=group_dir)
     results["exact_fira_summary_path"] = exact_out["summary_path"]
     results["ldadam_status_path"] = _write_ldadam_status(group_dir)
