@@ -54,6 +54,244 @@ compression. It only rules out exact dense residual conservation with
 sublinear persistent information in the worst case. Compressed residual
 variants are approximate EF and require separate theory.
 
+\subsection{Memory-limited BECR as approximate Error Feedback}
+\label{app:compressed-residual-becr}
+
+We now consider a memory-limited \BECR\ variant in which the persistent
+error-feedback buffer is replaced by an approximate residual $\hat e_t$. The
+update is
+\[
+\hat p_t = g_t + \hat e_t,\qquad
+q_t = C_t^{\mathrm{BECR}}(\hat p_t),\qquad
+r_t = \hat p_t - q_t,\qquad
+\hat e_{t+1} = S_t(r_t),\qquad
+x_{t+1} = x_t - \eta q_t.
+\]
+Define the residual-compression defect
+\[
+c_{t+1} = r_t - \hat e_{t+1} = r_t - S_t(r_t).
+\]
+Then the conservation law becomes defective:
+\[
+q_t + \hat e_{t+1}
+=
+g_t + \hat e_t - c_{t+1}.
+\]
+All of $\hat e_t$, $\hat p_t$, $q_t$, $r_t$, and $c_{t+1}$ are raw-gradient
+units, and the learning rate appears only in the parameter update. This is
+approximate Error Feedback, not exact EF; once $c_{t+1}\neq 0$, the method is
+no longer exact EF.
+
+\paragraph{Assumptions.}
+Let $f:\mathbb R^d\to\mathbb R$ be $L$-smooth and lower bounded by $f_\star$.
+Let $\{\mathcal F_t\}_{t\ge 0}$ be the filtration before sampling $g_t$, and
+assume
+\[
+\E[g_t\mid \mathcal F_t]=\grad f(x_t),\qquad
+\E\!\left[\norm{g_t-\grad f(x_t)}^2\mid \mathcal F_t\right]\le \sigma^2.
+\]
+After drawing $g_t$, define
+\[
+\mathcal G_t = \sigma(\mathcal F_t,g_t).
+\]
+Assume $C_t^{\mathrm{BECR}}$ is conditionally $\delta$-contractive on
+post-gradient signals:
+\[
+\E\!\left[\norm{v_t-C_t^{\mathrm{BECR}}(v_t)}^2\mid \mathcal G_t\right]
+\le (1-\delta)\norm{v_t}^2
+\]
+for every square-integrable $\mathcal G_t$-measurable $v_t$, with
+$\delta\in(0,1)$ for the residual-energy proof. Let $\eta>0$ be constant,
+$\hat e_0=0$, and define the cumulative defect budget
+\[
+\mathcal C_T := \sum_{t=0}^{T-1}\E\norm{c_{t+1}}^2.
+\]
+All constants below are conservative and are stated only to keep the defect
+accounting explicit.
+
+\begin{proposition}[Approximate residual-energy lemma]
+\label{prop:approx-becr-residual-energy}
+Define
+\[
+K_{\delta}^{\mathrm{AR}} := \frac{2(2-\delta)(4-\delta)}{\delta^2},
+\qquad
+J_{\delta}^{\mathrm{AR}} := \frac{4(2-\delta)}{\delta^2}.
+\]
+Then, for every $T\ge 1$,
+\[
+\sum_{t=0}^{T-1}\E\norm{\hat e_t}^2
+\le
+K_{\delta}^{\mathrm{AR}}
+\left(
+\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
++
+T\sigma^2
+\right)
++
+J_{\delta}^{\mathrm{AR}}\mathcal C_T.
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch.]
+Write $r_t=\hat p_t-q_t=\hat e_{t+1}+c_{t+1}$ and condition on
+$\mathcal G_t$. The exact-EF residual-energy proof controls the
+post-compression residual through the contractive complement
+$\hat p_t-C_t^{\mathrm{BECR}}(\hat p_t)$; the only change is that
+$\hat e_{t+1}$ now differs from that complement by the residual-compression
+defect $c_{t+1}$. Expanding
+$\norm{\hat p_t}^2\le 2\norm{g_t}^2 + 2\norm{\hat e_t}^2$, using conditional
+variance, and applying Young's inequality to the added defect terms yields the
+stated bound. The $J_{\delta}^{\mathrm{AR}}\mathcal C_T$ term is exactly what
+distinguishes approximate EF from exact EF.
+\end{proof}
+
+\paragraph{Perturbed iterate identity.}
+Define
+\[
+\tilde x_t = x_t - \eta \hat e_t.
+\]
+Using the defective conservation law,
+\[
+\tilde x_{t+1}
+=
+x_t-\eta q_t-\eta \hat e_{t+1}
+=
+\tilde x_t-\eta g_t+\eta c_{t+1}.
+\]
+This identity is mandatory: compressed residual BECR behaves like approximate
+EF with an additive raw-gradient defect sequence.
+
+\begin{theorem}[General defect-budget theorem]
+\label{thm:compressed-becr-general-defect}
+Assume
+\[
+\eta\le \frac{1}{8L},
+\qquad
+L^2\eta^2 K_{\delta}^{\mathrm{AR}}\le \frac{1}{8}.
+\]
+Then, for every $T\ge 1$,
+\[
+\frac{1}{T}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+\frac{8(f(x_0)-f_\star)}{\eta T}
++
+8L\eta\sigma^2
++
+8L^2\eta^2 K_{\delta}^{\mathrm{AR}}\sigma^2
++
+\left(20 + 8L\eta + 8L^2\eta^2J_{\delta}^{\mathrm{AR}}\right)\frac{\mathcal C_T}{T}.
+\]
+Without martingale or alignment assumptions on $c_{t+1}$, the leading defect
+contribution is therefore $\mathcal C_T/T$, not $\eta\mathcal C_T/T$. If
+$\mathcal C_T/T=O(1)$, the bound allows a constant defect floor. To retain
+$O(T^{-1/2})$ stationarity with $\eta=\Theta(T^{-1/2})$, one needs
+$\mathcal C_T/T = O(T^{-1/2})$ or stronger.
+\end{theorem}
+
+\begin{proof}[Proof sketch.]
+Apply smoothness to $f(\tilde x_t)$ under
+$\tilde x_{t+1}=\tilde x_t-\eta g_t+\eta c_{t+1}$. Without extra structure on
+$c_{t+1}$, the cross term
+$\langle \grad f(\tilde x_t), c_{t+1}\rangle$ has no cancellation and must be
+bounded by Young's inequality, which yields a first-order defect contribution
+of order $\mathcal C_T/T$ rather than $\eta\mathcal C_T/T$. The transfer from
+$\grad f(\tilde x_t)$ to $\grad f(x_t)$ introduces the residual-energy bound
+from Proposition~\ref{prop:approx-becr-residual-energy}. The constants above
+are conservative and are not intended as a sharp estimate.
+\end{proof}
+
+\begin{theorem}[Aligned or martingale defect theorem]
+\label{thm:compressed-becr-aligned-defect}
+Assume the hypotheses of
+Theorem~\ref{thm:compressed-becr-general-defect}. Suppose in addition that the
+defect sequence satisfies an alignment or cancellation condition:
+\[
+\sum_{t=0}^{T-1}\E\inner{\grad f(\tilde x_t)}{c_{t+1}}
+\le
+\alpha \sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
++
+\chi \eta \mathcal C_T
+\]
+for some $\alpha\in[0,1/8)$ and $\chi\ge 0$. A conditional mean-zero
+martingale defect with enough independence is a special case with $\alpha=0$.
+Then
+\[
+\frac{1}{T}\sum_{t=0}^{T-1}\E\norm{\grad f(x_t)}^2
+\le
+\frac{8(f(x_0)-f_\star)}{\eta T}
++
+O(L\eta\sigma^2)
++
+O(L^2\eta^2K_{\delta}^{\mathrm{AR}}\sigma^2)
++
+O\!\left((1+\chi)\eta \frac{\mathcal C_T}{T}\right),
+\]
+where the hidden constants depend only on $\alpha$, $L$, and $\delta$. Under
+this stronger structure, $\eta=\Theta(T^{-1/2})$ remains compatible with the
+usual $O(T^{-1/2})$ stationarity rate when $\mathcal C_T/T=O(1)$.
+\end{theorem}
+
+\begin{proof}[Proof sketch.]
+The additional assumption lets the first-order defect term scale like
+$\eta\mathcal C_T/T$ instead of $\mathcal C_T/T$. This is a strong
+assumption: it is not implied by residual compression alone, and it must come
+from alignment, martingale cancellation, or another explicit structural model
+for the defect sequence.
+\end{proof}
+
+\paragraph{Identity-transmission case \texorpdfstring{$\delta=1$}{delta=1}.}
+If $C_t^{\mathrm{BECR}}(v)=v$ almost surely on the relevant signal, then
+$r_t=0$. If $S_t(0)=0$ and $\hat e_0=0$, then $\hat e_t=0$ and
+$c_{t+1}=0$ for all $t$, so the method reduces to standard SGD. The
+residual-energy constants above are not used in this degenerate identity case.
+
+\paragraph{Corollaries and examples.}
+\begin{itemize}
+\item \textbf{Low-rank residual basis.}
+If $\hat e_{t+1}=B_tB_t^\top r_t$, then
+$c_{t+1}=(I-B_tB_t^\top)r_t$. Whenever
+$\sum_{t<T}\E\norm{c_{t+1}}^2\le \mathcal C_T$, the general theorem applies.
+This is an approximate-EF accounting only; it is not a novelty claim over
+GreedyLore or related low-rank compressors.
+\item \textbf{Sketched, sparse, or top-$k$ residuals.}
+The same defect budget applies through $\mathcal C_T$, and unbiased variants
+can instead be analyzed through a martingale variance budget if the
+mean-zero condition is justified.
+\item \textbf{Biased residual estimators.}
+A persistent bias in $c_{t+1}$ yields a stationarity neighborhood unless the
+bias energy is sublinear or is explicitly aligned.
+\item \textbf{Contractive residual compressors.}
+Even if $S_t$ is contractive on $r_t$, extra assumptions are still needed to
+bound $\mathcal C_T$ because $r_t$ itself depends on the evolving approximate
+buffer $\hat e_t$. One-level contractivity of $S_t$ does not preserve exact
+EF by itself.
+\end{itemize}
+
+\paragraph{Novelty boundary.}
+MicroAdam compresses correction information for adaptive optimization;
+LDAdam uses generalized EF for low-dimensional Adam gradient and optimizer-state
+compression; GreedyLore studies low-rank gradient compression with EF and
+convergence; and classical compressed EF already covers many generic
+compressed-residual ideas \citep{microadam,ldadam,greedylore,errorfeedback}.
+Our note is only an approximate-EF accounting for \Fira-style recovery-branch
+residuals. It is not a new compressed-EF framework and not Adam-state
+compensation.
+
+\paragraph{Memory implication.}
+Full residual BECR stores a full-size error-feedback buffer and therefore keeps
+exact EF at $O(d)$ resident information. A compressed residual may reduce
+resident memory to $O(k)$ or another compressed budget, but only by accepting
+residual-compression defect and therefore approximate EF rather than exact EF.
+Peak GPU memory savings still require measurement, and no memory-neutrality
+claim follows from this appendix note.
+
+\paragraph{Limitations.}
+This section adds theory only. It does not implement compressed residuals, does
+not validate any compressor experimentally, and does not prove Adam
+convergence. The deterministic theorem gives a $\mathcal C_T/T$ defect floor.
+The more favorable $\eta\mathcal C_T/T$ scaling requires explicit alignment or
+martingale cancellation and should not be assumed for arbitrary compressors.
+
 \begin{table}[h]
 \caption{Claim--evidence matrix for the integrated draft.}
 \label{tab:claim-evidence}

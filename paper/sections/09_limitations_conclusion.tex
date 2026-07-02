@@ -19,7 +19,13 @@ parameter-size residual buffer unless it is implemented by reusing gradient
 storage or by offloading/compressing the residual. Gradient-buffer reuse is a
 systems optimization and must be validated by peak-memory measurements;
 compressed or approximate residuals weaken exact EF guarantees and require
-separate theory. The memory accounting in this paper is synthetic and CPU only:
+separate theory. Memory-limited residuals are approximate Error Feedback. If
+the full residual is compressed, the conservation law becomes defective,
+$q_t+\hat e_{t+1}=g_t+\hat e_t-c_{t+1}$. Appendix~\ref{app:compressed-residual-becr}
+shows that \BECR-SGD then inherits the full-residual bound plus an explicit
+residual-compression defect term; without martingale or alignment structure,
+the leading defect contribution is $\mathcal C_T/T$, not
+$\eta\mathcal C_T/T$. The memory accounting in this paper is synthetic and CPU only:
 the artifact schema records residual bytes, projection bytes, and
 optimizer-state bytes, but we do not validate GPU peak memory or claim
 memory-neutrality. Fifth, LDAdam is treated as the closest related prior art,

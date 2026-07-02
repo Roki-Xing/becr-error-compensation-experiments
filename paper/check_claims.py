@@ -29,8 +29,18 @@ FORBIDDEN_PHRASES = [
     "BECR keeps same memory as Fira",
     "gradient-buffer reuse proves memory savings",
     "compressed residual has same theorem",
+    "same theorem as full residual",
     "residual is free",
     "full residual is free",
+    "compressed residual preserves exact EF",
+    "compressed residual is exact EF",
+    "memory-neutral compressed residual",
+    "defect term is always eta",
+    "C_T/T=O(1) is enough without alignment",
+    "compressed residual proves Adam convergence",
+    "compressed residual subsumes MicroAdam",
+    "compressed residual subsumes LDAdam",
+    "compressed residual subsumes GreedyLore",
 ]
 
 PROOF_FILES = [
@@ -247,6 +257,45 @@ def main() -> int:
             "no-free-lunch observation",
         ],
         "Appendix memory lower-bound note",
+    )
+
+    compressed_residual_text = "\n".join(
+        [limitations_text, memory_appendix_text, claim_matrix_text]
+    )
+    _require_contains(
+        failures,
+        compressed_residual_text,
+        [
+            "approximate Error Feedback",
+            "residual-compression defect",
+            "becomes defective",
+            r"c_{t+1}",
+            r"\mathcal C_T",
+            "martingale",
+            "alignment",
+            "no longer exact EF",
+            r"\eta\mathcal C_T/T",
+        ],
+        "Compressed-residual appendix note",
+    )
+    if (
+        r"\mathcal C_T/T" not in compressed_residual_text
+        and r"Ccal_T/T" not in compressed_residual_text
+        and r"\mathcal C_T / T" not in compressed_residual_text
+    ):
+        failures.append(
+            "Compressed-residual appendix note missing explicit C_T/T-style defect-floor wording"
+        )
+    _require_contains(
+        failures,
+        memory_appendix_text,
+        [
+            r"q_t + \hat e_{t+1}",
+            r"g_t + \hat e_t - c_{t+1}",
+            "not exact EF",
+            "The more favorable",
+        ],
+        "Compressed-residual defective conservation note",
     )
 
     for relative_path in PROOF_FILES:
