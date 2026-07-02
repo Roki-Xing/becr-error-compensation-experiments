@@ -1,21 +1,28 @@
 \centering
 \scriptsize
-\begin{tabularx}{\linewidth}{p{3.0cm}p{2.3cm}X}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccccccccccccc}
 \toprule
-Tracked field & Present in corrected synthetic schema? & Allowed interpretation \\
+Method & params & grads & Adam $m$ & Adam $v$ & low-rank $m/v$ & basis & residual $e$ & comp.\ residual & temp.\ proj./SVD & resident GPU mem. & peak GPU mem. & offload / comm. & guarantee type & claim status \\
 \midrule
-\texttt{parameter\_bytes} & Yes & CPU synthetic accounting only \\
-\texttt{gradient\_buffer\_bytes} & Yes & Buffer schema is tracked, not optimized here \\
-\texttt{first\_moment\_bytes} & Yes & Low-rank state size is recorded \\
-\texttt{second\_moment\_bytes} & Yes & Low-rank state size is recorded \\
-\texttt{projection\_bytes} & Yes & Projection storage is tracked \\
-\texttt{residual\_bytes} & Yes & Residual storage is explicitly counted \\
-\texttt{peak\_memory\_allocated}/\texttt{reserved} & Present but null on CPU smoke/review runs & No GPU memory-efficiency claim \\
-Wall-clock / step time & Yes & Diagnostic runtime only \\
+AdamW & $d$ & $d$ & $d$ & $d$ & -- & -- & -- & -- & none & baseline optimizer state & must be measured & none & classical Adam reference & baseline only \\
+GaLore & $d$ & $d$ & -- & -- & low-rank & yes & -- & -- & projection / SVD temp & potentially reduced state, not audited here & must be measured & projection cost & out of scope here & no BECR memory claim \\
+\Fira & $d$ & $d$ & -- & -- & low-rank & yes & -- & -- & projection / SVD temp & not audited here & must be measured & none & recovery baseline only & not a memory-equivalent target \\
+LDAdam & $d$ & $d$ & method-specific & method-specific & low-dim / projected & yes & method-specific & method-specific & method-specific & not audited here & must be measured & method-specific & generalized-EF state compensation & out of scope here \\
+\BECR\ full residual & $d$ & $d$ & -- & -- & low-rank & yes & $d$ & -- & projection temp & low-rank states + full-size error-feedback buffer & must be measured & optional offload only & exact dense EF algebra + SGD abstraction & not memory-neutral \\
+\BECR\ compressed residual & $d$ & $d$ & -- & -- & low-rank & yes & -- & $<d$ if compressed & projection + compression temp & may drop only with approximation & must be measured & compression / offload cost & approximate EF only & separate theory required \\
+\BECR\ gradient-buffer reuse & $d$ & aliased & -- & -- & low-rank & yes & aliased if lifecycle permits & -- & lifecycle-dependent temp & may avoid extra resident buffer only under aliasing assumptions & must be measured & optional alias / offload only & same exact algebra only if aliasing is exact & systems hypothesis only \\
+\BECR\ limiter-only / no persistent residual & $d$ & $d$ & -- & -- & low-rank & yes & -- & -- & projection temp & no persistent EF buffer & must be measured & none & no EF theorem & diagnostic / ablation only \\
 \bottomrule
-\end{tabularx}
+\end{tabular}%
+}
 
 \medskip
-\noindent\textit{Caveat.} This table is CPU synthetic accounting only. It does
-not validate GPU peak memory, does not claim memory-neutrality, and should not
-be read as a systems efficiency result.
+\noindent\textit{Caveats.} Full-residual \BECR\ has $O(d)$ persistent
+residual memory. Gradient-buffer reuse may avoid an extra resident buffer only
+under lifecycle assumptions and must be validated by peak-memory
+measurements. Compressed residual variants are approximate EF and need
+separate theory. Limiter-only / no-residual variants do not get the EF
+theorem. This table is CPU synthetic accounting only and does not prove GPU
+savings.
