@@ -25,6 +25,12 @@ FORBIDDEN_PHRASES = [
     "BECR is stronger than clipping in the fixed-stale regime",
     "High-dimensional synthetic proves full stationarity",
     "LDAdam is weaker than BECR",
+    "BECR has same memory as Fira",
+    "BECR keeps same memory as Fira",
+    "gradient-buffer reuse proves memory savings",
+    "compressed residual has same theorem",
+    "residual is free",
+    "full residual is free",
 ]
 
 PROOF_FILES = [
@@ -88,7 +94,7 @@ def main() -> int:
 
     for phrase in FORBIDDEN_PHRASES:
         for path, text in texts.items():
-            if phrase in text:
+            if phrase.lower() in text.lower():
                 failures.append(
                     f"forbidden phrase found: {phrase!r} in {path.relative_to(root)}"
                 )
@@ -199,6 +205,48 @@ def main() -> int:
             "do not offer an empirical LDAdam comparison",
         ],
         "Limitations section",
+    )
+
+    memory_appendix_text = (
+        root / "appendix" / "app_ablations_memory.tex"
+    ).read_text(encoding="utf-8")
+    memory_table_text = (
+        root / "tables" / "memory_runtime_accounting.tex"
+    ).read_text(encoding="utf-8")
+    claim_matrix_text = (
+        root / "tables" / "claim_evidence_matrix.tex"
+    ).read_text(encoding="utf-8")
+    memory_text = "\n".join(
+        [limitations_text, memory_appendix_text, memory_table_text, claim_matrix_text]
+    )
+    _require_contains(
+        failures,
+        memory_text,
+        [
+            "full raw-gradient residual",
+            "error-feedback buffer",
+            "gradient-buffer reuse",
+            "peak-memory measurements",
+            "separate theory",
+            "approximate EF",
+        ],
+        "Memory limitations / appendix note",
+    )
+    if r"O(d)" not in memory_text and r"\Omega(d)" not in memory_text:
+        failures.append(
+            "Memory limitations / appendix note missing O(d) or \\Omega(d) lower-bound wording"
+        )
+    _require_contains(
+        failures,
+        memory_appendix_text,
+        [
+            "Memory lower bound for exact residual conservation",
+            r"q_t + e_{t+1} = g_t + e_t",
+            r"p_{t+1}=g_{t+1}+e_{t+1}",
+            "Proof sketch",
+            "no-free-lunch observation",
+        ],
+        "Appendix memory lower-bound note",
     )
 
     for relative_path in PROOF_FILES:

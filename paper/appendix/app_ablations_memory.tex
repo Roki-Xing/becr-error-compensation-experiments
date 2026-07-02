@@ -8,6 +8,52 @@ and full current-projection residual modes;
 \item CPU-only memory/runtime accounting.
 \end{itemize}
 
+\subsection{Memory lower bound for exact residual conservation}
+
+We use residual accumulation for the EF mechanism and error-feedback buffer for
+the persistent storage of $e_t$.
+
+\begin{proposition}[No-free-lunch note for exact dense Error Feedback]
+\label{prop:memory-lower-bound}
+For arbitrary dense residuals, any exact implementation of the EF identity
+\[
+q_t + e_{t+1} = g_t + e_t
+\]
+that works for all future inputs must store sufficient information to
+reconstruct $e_t$. Under finite-precision storage or continuous
+finite-dimensional state models, this requires $\Omega(d)$ persistent
+information in the worst case.
+\end{proposition}
+
+\begin{proof}[Proof sketch.]
+Exact EF requires forming the next compensated gradient
+\[
+p_{t+1}=g_{t+1}+e_{t+1}.
+\]
+Suppose two distinct residuals $e\neq e'$ map to the same persistent internal
+state $s$. At the next step choose the same future gradient $g_{t+1}$ for both
+histories. Exact EF then requires different compensated signals
+$g_{t+1}+e$ and $g_{t+1}+e'$, but the algorithm cannot distinguish the two
+histories from the same state $s$. This contradiction shows that the
+persistent state must uniquely encode every possible residual in the residual
+set. Under finite-precision storage, encoding an arbitrary dense $d$-vector to
+fixed accuracy requires $\Omega(d)$ words in the worst case. Under continuous
+finite-dimensional state with continuous update and readout maps,
+invariance-of-domain style reasoning rules out an injective continuous
+encoding of an open subset of $\mathbb{R}^d$ into $\mathbb{R}^m$ for $m<d$.
+Hence exact dense residual conservation has an $\Omega(d)$
+persistent-information requirement in the worst case.
+\end{proof}
+
+\paragraph{Scope.}
+This is a no-free-lunch observation, not a headline theorem. It depends on a
+reasonable finite-precision or continuous-state storage model. It does not
+rule out gradient-buffer aliasing, CPU offload, low precision, sparse or
+low-rank residuals under additional structure, or approximate residual
+compression. It only rules out exact dense residual conservation with
+sublinear persistent information in the worst case. Compressed residual
+variants are approximate EF and require separate theory.
+
 \begin{table}[h]
 \caption{Claim--evidence matrix for the integrated draft.}
 \label{tab:claim-evidence}

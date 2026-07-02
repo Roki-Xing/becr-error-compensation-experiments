@@ -8,14 +8,25 @@ is an SGD abstraction, not an Adam convergence theorem. Third, we do not
 include neural diagnostics: CIFAR, MNIST, WikiText, and TinyGPT remain blocked
 and are not used as evidence here.
 
-Fourth, the memory accounting in this paper is synthetic and CPU only. The
-artifact schema records residual bytes, projection bytes, and optimizer-state
-bytes, but we do not validate GPU peak memory or claim memory-neutrality.
-Fifth, LDAdam is treated as the closest related prior art, but we do not offer
-an empirical LDAdam comparison in this draft. Finally, the corrected synthetic
-evidence shows that clipping already repairs the fixed-stale orthogonal channel;
-\BECR\ should therefore be read as a residualized repair mechanism, not as a
-universal improvement over clipping.
+Fourth, \BECR's cleanest theory uses a full raw-gradient residual $e_t$. This
+residual is a mechanism for exact error conservation, not a free memory
+optimization. We use residual accumulation for the EF mechanism and
+error-feedback buffer for the persistent storage of $e_t$. For arbitrary dense
+recovery errors, exact EF-style conservation requires enough persistent
+information to reconstruct the residual, which is $O(d)$ in the worst case.
+Thus full-residual \BECR\ preserves low-rank Adam states but may add a
+parameter-size residual buffer unless it is implemented by reusing gradient
+storage or by offloading/compressing the residual. Gradient-buffer reuse is a
+systems optimization and must be validated by peak-memory measurements;
+compressed or approximate residuals weaken exact EF guarantees and require
+separate theory. The memory accounting in this paper is synthetic and CPU only:
+the artifact schema records residual bytes, projection bytes, and
+optimizer-state bytes, but we do not validate GPU peak memory or claim
+memory-neutrality. Fifth, LDAdam is treated as the closest related prior art,
+but we do not offer an empirical LDAdam comparison in this draft. Finally, the
+corrected synthetic evidence shows that clipping already repairs the
+fixed-stale orthogonal channel; \BECR\ should therefore be read as a
+residualized repair mechanism, not as a universal improvement over clipping.
 
 \section{Conclusion}
 

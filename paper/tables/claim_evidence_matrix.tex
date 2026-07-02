@@ -12,5 +12,9 @@ Separated raw-gradient residual transmission repairs the $2$D regime & Theorem~\
 High-dimensional stale failure is not a $2$D artifact & Corrected high-dimensional fixed-stale summary and Figure~\ref{fig:highdim-refresh} & Universal full stationarity \\
 Refresh frequency is a boundary condition & Corrected refresh sweep under explicit state modes & That reset/carry/transport differences transfer directly to neural performance \\
 Noisy-projection differences are reproducible under CRN & Accepted anisotropic summary and appendix figure provenance & Broad projected-baseline superiority or neural robustness \\
+Exact dense EF residual conservation requires $O(d)$ persistent information in the worst case & Appendix Proposition~\ref{prop:memory-lower-bound}. Status: Derived / appendix proposition. Safe wording: ``In the worst case, exact dense residual conservation requires a full-size residual buffer.'' & Unsafe wording: ``BECR is memory-free.'' \\
+Full-residual \BECR\ is not memory-neutral & Limitations paragraph plus Table~\ref{tab:memory-accounting}. Status: Verified / Derived. Safe wording: ``Full-residual \BECR\ may add a parameter-size residual buffer.'' & Unsafe wording: ``\BECR\ has the same memory as \Fira.'' \\
+Gradient-buffer reuse may reduce peak memory & Appendix memory table only. Status: Risk / systems hypothesis. Safe wording: ``Gradient-buffer reuse must be validated by peak-memory measurements.'' & Unsafe wording: ``Gradient-buffer reuse proves memory neutrality.'' \\
+Compressed-residual \BECR\ is approximate EF & Limitations plus appendix memory note. Status: Future work / risk. Safe wording: ``Compressed residual variants require separate approximate-EF theory.'' & Unsafe wording: ``Compressed residual has the same convergence theorem.'' \\
 \bottomrule
 \end{tabularx}
